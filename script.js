@@ -4,7 +4,7 @@
 
 alert("KUKAMI v1.2: Jalur Cepat Aktif!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx-TpNjanPxKZcPXj-a9-hm7Q3OzExUwlcztp_hOTB4y9qpMkxCxMCioLHNF2GA4Lwf/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbycy-UG55-x9yQe_ToKvonaXo7ZN0WklvxiYA37bu-sdw4chlNEgnYDabxmaZU9T7Ci/exec";
 
 let curRider = {}; 
 
