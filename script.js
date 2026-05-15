@@ -1,16 +1,18 @@
 /**
- * KUKAMI SUPERAPP v1.2 - PRODUCTION READY
- * Build Date: 2026-05-15
- * Perbaikan: Nama Rider (Kolom B), Sapaan (Kolom X), Anti-Kickback
+ * KUKAMI ENGINE v2.2 - FINAL STABLE
+ * Sinkronisasi Otomatis HTML + CSS + GAS
  */
 
-alert("KUKAMI Engine v1.2 Aktif!");
-
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaiD8Bf1081aih6JvO28MBmWMkPttOsL0Yj8uXX8MeeTrygS8gebvJ6sfCVSR9ch6M/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwB8_0wPWBjqnCawghWBGXfLmGM3yEp855P4RFOKCtem8IQmzeDZRTe4Up7h9gXPpfQ/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
 // --- 1. UTILS ---
+const showLoading = (s) => { 
+    const l = document.getElementById('loader'); 
+    if(l) l.style.display = s ? 'flex' : 'none'; 
+};
+
 const getFingerprint = () => {
     let id = localStorage.getItem('kukami_fp');
     if (!id) {
@@ -23,14 +25,7 @@ const getFingerprint = () => {
 const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
 
-const showLoading = (s) => { 
-    const l = document.getElementById('loader'); 
-    if(l) l.style.display = s ? 'flex' : 'none'; 
-    // Auto-mati setelah 15 detik jika stuck
-    if(s) setTimeout(() => { if(l) l.style.display = 'none'; }, 15000);
-};
-
-// --- 2. AUTH (LOGIN) ---
+// --- 2. CORE LOGIN ---
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
@@ -38,13 +33,7 @@ function prosesLogin() {
     
     if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
-    const params = "?action=login" + 
-                   "&user=" + encodeURIComponent(user) + 
-                   "&pin=" + encodeURIComponent(pin) + 
-                   "&fp=" + getFingerprint() + 
-                   "&ua=" + encodeURIComponent(navigator.userAgent);
-
-    const url = WEB_APP_URL + params;
+    const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin) + "&fp=" + getFingerprint() + "&ua=" + encodeURIComponent(navigator.userAgent);
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
@@ -54,63 +43,49 @@ function prosesLogin() {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") { 
-                        curRider = res.rider; // Mengambil ID (A) dan Nama (B)
+                        curRider = res.rider; 
                         localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                        alert("Berhasil! Selamat Datang " + curRider.nama);
                         initDashboard(); 
                     } else {
                         showLoading(false);
-                        alert("Gagal: " + (res.message || "Akses Ditolak"));
+                        alert("Akses Ditolak: " + (res.message || "Nama/PIN Salah"));
                     }
                 } catch(e) {
                     showLoading(false);
-                    alert("Data Server Tidak Terbaca!");
+                    alert("Gagal memproses data server!");
                 }
             } else {
                 showLoading(false);
-                alert("Koneksi Error: " + xhr.status);
+                alert("Koneksi Google Bermasalah");
             }
         }
     };
     xhr.send();
 }
 
-// --- 3. DASHBOARD ENGINE ---
+// --- 3. DASHBOARD ENGINE (ANTI-MUTER) ---
 function initDashboard() {
-    // Paksa Pindah Layar (Anti-Kickback)
-    const pLogin = document.getElementById('p-login');
-    const pApp = document.getElementById('app-content');
-    if(pLogin) pLogin.style.display = 'none';
-    if(pApp) pApp.style.display = 'block';
-    
+    // Pindah layar duluan agar user tidak bosan melihat loader di login
+    document.getElementById('p-login').classList.remove('active');
+    document.getElementById('app-content').style.display = 'block';
     showLoading(true);
 
-    const storedSession = JSON.parse(localStorage.getItem('kukami_session') || "{}");
-    const targetId = curRider.id || storedSession.id;
+    const session = JSON.parse(localStorage.getItem('kukami_session') || "{}");
+    const targetId = curRider.id || session.id;
 
-    if(!targetId) {
-        logout();
-        return;
-    }
+    if(!targetId) { logout(); return; }
 
-    const url = WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId);
-    
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
+    xhr.open("GET", WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId), true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             showLoading(false);
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
-                    if(res.status === "error") {
-                        alert(res.message);
-                        return;
-                    }
-                    
-                    renderUI(res);
+                    renderDashboardUI(res);
                 } catch(e) {
-                    console.error("Render Error:", e);
+                    console.error("Gagal render data dashboard", e);
                 }
             }
         }
@@ -118,85 +93,121 @@ function initDashboard() {
     xhr.send();
 }
 
-// --- 4. RENDER UI DATA ---
-function renderUI(res) {
+// --- 4. RENDER DATA KE HTML (Sesuai ID HTML Bos) ---
+function renderDashboardUI(res) {
+    // Nama & Sapaan (Kolom B & X)
     const elNama = document.getElementById('r-nama');
     if(elNama) {
-        // Logika: Jika ada Sapaan di kolom X, tampilkan "Sapaan, NamaAsli"
-        // Jika kolom X kosong, tampilkan NamaAsli saja.
-        let teksHeader = "";
-        if (res.sapaan && res.sapaan.trim() !== "") {
-            teksHeader = res.sapaan + ", " + res.namaAsli;
-        } else {
-            teksHeader = res.namaAsli;
-        }
-        
-        elNama.innerText = teksHeader;
+        // Teks Sapaan (X) + Nama (B)
+        const sapaan = res.sapaan ? res.sapaan + ", " : "";
+        elNama.innerText = sapaan + res.namaAsli;
     }
-    
-    // Matikan loading di akhir render
-    showLoading(false);
+
     // Saldo (Kolom Q)
-    const elSaldo = document.getElementById('r-saldo');
-    if(elSaldo) {
-        elSaldo.innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
+    if(document.getElementById('r-saldo')) {
+        document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
     }
 
     // Foto (Kolom D)
-    const elFoto = document.getElementById('r-foto');
-    if(elFoto && res.foto) {
-        elFoto.src = res.foto;
+    if(res.foto && document.getElementById('r-foto')) {
+        document.getElementById('r-foto').src = res.foto;
     }
 
-    // Stats Hari (Kolom R & S)
+    // Stats Hari Ini (R & S)
     if(res.stats && res.stats.hari) {
-        if(document.getElementById('h-total')) document.getElementById('h-total').innerText = res.stats.hari.total;
-        if(document.getElementById('h-on')) document.getElementById('h-on').innerText = res.stats.hari.on;
-        if(document.getElementById('h-off')) document.getElementById('h-off').innerText = res.stats.hari.off;
+        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
+        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
+        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
         
-        // Ranking Hari (Kolom Z & AA)
-        if(document.getElementById('rk-h-on')) document.getElementById('rk-h-on').innerText = "Peringkat: " + res.stats.hari.rank_on;
+        // Peringkat (Z) - Gunakan class rank-badge dari CSS Bos
+        const rkOn = document.getElementById('rk-h-on');
+        if(rkOn && res.stats.hari.rank_on) {
+            rkOn.innerHTML = `<span class="rank-badge bg-rank-hari-top">${res.stats.hari.rank_on}</span>`;
+        }
     }
 
-    // Stats Bulan (Kolom T & U)
+    // Stats Bulan Ini (T & U)
     if(res.stats && res.stats.bulan) {
-        if(document.getElementById('b-total')) document.getElementById('b-total').innerText = res.stats.bulan.total;
-        if(document.getElementById('b-on')) document.getElementById('b-on').innerText = res.stats.bulan.on;
-        if(document.getElementById('b-off')) document.getElementById('b-off').innerText = res.stats.bulan.off;
+        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
+        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
+        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
     }
 
-    // Riwayat & Tarif
+    // List Tarif & Kategori
     masterTarif = res.listTarif || [];
-    if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
-    
-    // Kategori Chips
-    let cats = [...new Set(masterTarif.map(x => x.kategori))];
     const catList = document.getElementById('cat-list');
-    if (cats.length > 0 && catList) {
+    if(catList && masterTarif.length > 0) {
+        let cats = [...new Set(masterTarif.map(x => x.kategori))];
         catList.innerHTML = cats.map(cat => 
             `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-        if(typeof renderGrid === 'function') renderGrid(cats[0]);
+        renderGrid(cats[0]);
     }
 }
 
-// --- 5. SYSTEM ---
+// --- 5. FUNGSI NAVIGASI & TAB ---
+function switchMainTab(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    if(tab === 'home') {
+        document.getElementById('p-home').classList.add('active');
+        document.getElementById('n-home').classList.add('active');
+    } else {
+        document.getElementById('p-riwayat').classList.add('active');
+        document.getElementById('n-riwayat').classList.add('active');
+    }
+}
+
+function setSubTab(n) {
+    const fManual = document.getElementById('f-manual');
+    const fTarif = document.getElementById('f-tarif');
+    const tb1 = document.getElementById('tb1');
+    const tb2 = document.getElementById('tb2');
+
+    if(n === 1) {
+        fManual.style.display = 'block';
+        fTarif.style.display = 'none';
+        tb1.className = 'tab-btn tab-active';
+        tb2.className = 'tab-btn tab-inactive';
+    } else {
+        fManual.style.display = 'none';
+        fTarif.style.display = 'block';
+        tb1.className = 'tab-btn tab-inactive';
+        tb2.className = 'tab-btn tab-active';
+    }
+}
+
+function renderGrid(cat) {
+    const grid = document.getElementById('grid-list');
+    if(!grid) return;
+    const filtered = masterTarif.filter(t => t.kategori === cat);
+    grid.innerHTML = filtered.map(t => `
+        <div class="service-card" onclick="addToCart('${t.layanan}', ${t.nominal}, ${t.potongan})">
+            <b>${t.layanan}</b>
+            <span>Rp ${Number(t.nominal).toLocaleString('id-ID')}</span>
+        </div>
+    `).join('');
+}
+
 function logout() {
     localStorage.removeItem('kukami_session');
     location.reload();
 }
 
-window.onload = function() { 
-    const s = localStorage.getItem('kukami_session'); 
-    if (s) { 
-        curRider = JSON.parse(s); 
-        initDashboard(); 
-    } 
-    
-    // Auto-format input topup nominal
-    const topupInput = document.getElementById('u-nom');
-    if(topupInput) {
-        topupInput.addEventListener('input', function() { 
-            this.value = formatRibuan(this.value); 
-        });
+// --- 6. INITIAL LOAD ---
+window.onload = function() {
+    const s = localStorage.getItem('kukami_session');
+    if(s) {
+        curRider = JSON.parse(s);
+        initDashboard();
     }
 };
+
+// Fungsi pendukung Kalkulator Manual
+function pressNum(v) {
+    const input = document.getElementById('m-nom');
+    if(v === 'C') { curNomStr = "0"; }
+    else if(v === '⌫') { curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; }
+    else { curNomStr = curNomStr === "0" ? v : curNomStr + v; }
+    input.value = "Rp " + formatRibuan(curNomStr);
+}
