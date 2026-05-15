@@ -81,12 +81,12 @@ function initDashboard() {
         
         let cats = [...new Set(masterTarif.map(x => x.kategori))];
         if (cats.length > 0) {
-            document.getElementById('cat-list').innerHTML = cats.map(cat => 
-                `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-            renderGrid(cats[0]);
-        }
+        document.getElementById('cat-list').innerHTML = cats.map(cat => 
+          `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+        if (typeof renderGrid === 'function') renderGrid(cats[0]);
+      }
     })
-    .catch(err => { showLoading(false); console.error(err); });
+    .catch(err => { showLoading(false); console.error(err); }); // Penutup yang benar
 }
 
 // LOGIKA LAINNYA TETAP SAMA... (NUMPAD, GRID, DLL)
