@@ -1,7 +1,7 @@
 // DEBUG: Jika muncul alert ini, berarti koneksi GitHub ke APK AMAN
 alert("QASIRKU Engine v1.1 Dimuat!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwtwVwGsKA4edGm6Cl-2Qnyxsk4jLyNjQICecbUhmIqkf92-oEK-L82EcsW4jSaxrWC/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzsUReVGdtgIeEcs8R4CQULuFIsh7sfayC0RPODky2xBpk-8fIzji-Sz5wEIY6N6Ci2/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
@@ -40,7 +40,6 @@ function prosesLogin() {
 
     const url = `${WEB_APP_URL}?action=login&user=${encodeURIComponent(user)}&pin=${encodeURIComponent(pin)}&fp=${getFingerprint()}&ua=${navigator.userAgent}`;
 
-    // MENGGUNAKAN XHR (LEBIH TEMBUS DI ANDROID)
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     
@@ -53,27 +52,29 @@ function prosesLogin() {
                     if(res.status === "success") { 
                         curRider = res.rider; 
                         localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                        alert("Login Sukses! Membuka Dashboard..."); // Debug
+                        // Jika berhasil, lanjut ke Dashboard
                         initDashboard(); 
                     } else {
-                        alert("Akses Ditolak: PIN Salah");
+                        alert("Gagal: " + (res.message || "PIN Salah"));
                     }
                 } catch(e) {
-                    alert("Gagal baca data server. Pastikan GAS sudah 'Anyone'.");
+                    alert("Respon Server Error. Pastikan Deploy GAS sudah 'Anyone'.");
                 }
             } else {
-                alert("Koneksi Error. Code: " + xhr.status);
+                alert("Koneksi Gagal. Status: " + xhr.status);
             }
         }
     };
-
+    
     xhr.onerror = function() {
         showLoading(false);
-        alert("Koneksi Diblokir APK! Cek IgnoreSSLErrors di MIT.");
+        alert("Akses Diblokir! Cek Internet atau Setting MIT.");
     };
-
+    
     xhr.send();
 }
+
+
 // --- DASHBOARD ---
 function initDashboard() {
     document.getElementById('p-login').style.display = 'none'; 
