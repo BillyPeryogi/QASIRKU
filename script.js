@@ -19,9 +19,9 @@ function prosesLogin() {
     const user = document.getElementById('user').value;
     const pin = document.getElementById('pin').value;
     
-    if(!user || !pin) { showLoading(false); return alert("Nama & PIN wajib diisi!"); }
+    if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
-    // Kirim Nama (B) dan PIN (C)
+    // KUNCI SUKSES: Pastikan action=login tertulis setelah tanda tanya (?)
     const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
 
     var xhr = new XMLHttpRequest();
@@ -32,23 +32,20 @@ function prosesLogin() {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") { 
-                        // KUNCI: Simpan hasil balikan dari Google (ID asli dari Kolom A)
                         curRider = res.rider; 
-                        localStorage.setItem('kukami_session', JSON.stringify(res.rider)); 
-                        
-                        // LANGSUNG MASUK
+                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
                         initDashboard(); 
                     } else {
                         showLoading(false);
-                        alert("Nama atau PIN salah!");
+                        alert("Gagal: " + res.message);
                     }
                 } catch(e) {
                     showLoading(false);
-                    alert("Format server salah, pastikan GAS New Version!");
+                    alert("Respon server tidak valid!");
                 }
             } else {
                 showLoading(false);
-                alert("Gagal koneksi ke Google!");
+                alert("Koneksi ke Google Gagal!");
             }
         }
     };
