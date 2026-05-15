@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1DNc7CYCdaFVwVLJIMsnxqeZ2B3PxzPSJqLW5FpEJFjXbMJ9w44SQCQfkMz2VcPmB/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwnyxovvVjNqIWYrxAG53n3c7_dZnpuscDyxriE06yH_Ots4dpdmOuiE48wzV2hLyk3/exec";
 
 let warnedOnce = false;
 let curRider = {}, masterTarif = [], cart = [], pendingItem = null, curNomStr = "0";
