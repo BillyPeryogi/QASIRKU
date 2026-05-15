@@ -1,15 +1,24 @@
-// DEBUG: Jika muncul alert ini, koneksi GitHub ke APK AMAN
-alert("KUKAMI Engine v1.1 Aktif!");
+/**
+ * KUKAMI SUPERAPP v1.2 - PRODUCTION READY
+ * Build Date: 2026-05-15
+ * Perbaikan: Nama Rider (Kolom B), Sapaan (Kolom X), Anti-Kickback
+ */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby1x8eNx_ynDqES6BvcagDUI5ZXsjTIb_K0cwj0vfNCU-yfBWhz-rDDCh0EzgG3iWtU/exec";
+alert("KUKAMI Engine v1.2 Aktif!");
+
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwE4LkruNYREKjKj2-5CYC96PQxO7McyzZNo3qKiagNa0C_lHTerD-mD8qUmzKsFav6/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
-// --- UTILS ---
-const getFingerprint = () => localStorage.getItem('kukami_fp') || (() => { 
-    let id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase(); 
-    localStorage.setItem('kukami_fp', id); return id; 
-})();
+// --- 1. UTILS ---
+const getFingerprint = () => {
+    let id = localStorage.getItem('kukami_fp');
+    if (!id) {
+        id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        localStorage.setItem('kukami_fp', id);
+    }
+    return id;
+};
 
 const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
@@ -17,10 +26,11 @@ const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
 const showLoading = (s) => { 
     const l = document.getElementById('loader'); 
     if(l) l.style.display = s ? 'flex' : 'none'; 
+    // Auto-mati setelah 15 detik jika stuck
     if(s) setTimeout(() => { if(l) l.style.display = 'none'; }, 15000);
 };
 
-// --- AUTH (PROSES LOGIN) ---
+// --- 2. AUTH (LOGIN) ---
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
@@ -28,51 +38,58 @@ function prosesLogin() {
     
     if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
-    const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin) + "&fp=" + getFingerprint() + "&ua=" + encodeURIComponent(navigator.userAgent);
+    const params = "?action=login" + 
+                   "&user=" + encodeURIComponent(user) + 
+                   "&pin=" + encodeURIComponent(pin) + 
+                   "&fp=" + getFingerprint() + 
+                   "&ua=" + encodeURIComponent(navigator.userAgent);
+
+    const url = WEB_APP_URL + params;
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
-    
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") { 
-                        curRider = res.rider; 
+                        curRider = res.rider; // Mengambil ID (A) dan Nama (B)
                         localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                        alert("Selamat Datang, " + curRider.nama);
+                        alert("Berhasil! Selamat Datang " + curRider.nama);
                         initDashboard(); 
                     } else {
                         showLoading(false);
-                        alert("Akses Ditolak: Cek Nama & PIN");
+                        alert("Gagal: " + (res.message || "Akses Ditolak"));
                     }
                 } catch(e) {
                     showLoading(false);
-                    alert("Format Data Server Salah! Periksa Deploy GAS Bos.");
+                    alert("Data Server Tidak Terbaca!");
                 }
             } else {
                 showLoading(false);
-                alert("Server Google Tidak Merespon (Error " + xhr.status + ")");
+                alert("Koneksi Error: " + xhr.status);
             }
         }
     };
     xhr.send();
 }
 
-// --- DASHBOARD (SATU FUNGSI SAJA) ---
+// --- 3. DASHBOARD ENGINE ---
 function initDashboard() {
-    // Pindah Tampilan
-    document.getElementById('p-login').style.display = 'none'; 
-    document.getElementById('app-content').style.display = 'block';
+    // Paksa Pindah Layar (Anti-Kickback)
+    const pLogin = document.getElementById('p-login');
+    const pApp = document.getElementById('app-content');
+    if(pLogin) pLogin.style.display = 'none';
+    if(pApp) pApp.style.display = 'block';
+    
     showLoading(true);
 
-    const targetId = curRider.id || JSON.parse(localStorage.getItem('kukami_session') || "{}").id;
-    
-    // Jika ID tetap kosong, jangan lanjut
+    const storedSession = JSON.parse(localStorage.getItem('kukami_session') || "{}");
+    const targetId = curRider.id || storedSession.id;
+
     if(!targetId) {
-        showLoading(false);
-        document.getElementById('p-login').style.display = 'block';
+        logout();
         return;
     }
 
@@ -80,44 +97,20 @@ function initDashboard() {
     
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
-    
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             showLoading(false);
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
-                    
-                    // RENDER DATA KE UI
-                    document.getElementById('r-nama').innerHTML = (res.sapaan || curRider.nama || "Rider");
-                    document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
-                    if(res.foto) document.getElementById('r-foto').src = res.foto;
-                    
-                    // Stats
-                    if(res.stats) {
-                        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
-                        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
-                        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
-                        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
-                        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
-                        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
+                    if(res.status === "error") {
+                        alert(res.message);
+                        return;
                     }
-
-                    masterTarif = res.listTarif || [];
-                    if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
                     
-                    // Render Kategori
-                    let cats = [...new Set(masterTarif.map(x => x.kategori))];
-                    if (cats.length > 0) {
-                        const catList = document.getElementById('cat-list');
-                        if(catList) {
-                            catList.innerHTML = cats.map(cat => 
-                                `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-                            if(typeof renderGrid === 'function') renderGrid(cats[0]);
-                        }
-                    }
+                    renderUI(res);
                 } catch(e) {
-                    console.error("Gagal Render Dashboard", e);
+                    console.error("Render Error:", e);
                 }
             }
         }
@@ -125,7 +118,64 @@ function initDashboard() {
     xhr.send();
 }
 
-// --- INITIALIZE ---
+// --- 4. RENDER UI DATA ---
+function renderUI(res) {
+    // Nama & Sapaan (Kolom B & X)
+    const elNama = document.getElementById('r-nama');
+    if(elNama) {
+        // Tampilkan "Pagi, NamaRider" jika ada sapaan (X), jika tidak tampilkan Nama (B)
+        elNama.innerText = res.sapaan ? res.sapaan + ", " + res.namaAsli : res.namaAsli;
+    }
+
+    // Saldo (Kolom Q)
+    const elSaldo = document.getElementById('r-saldo');
+    if(elSaldo) {
+        elSaldo.innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
+    }
+
+    // Foto (Kolom D)
+    const elFoto = document.getElementById('r-foto');
+    if(elFoto && res.foto) {
+        elFoto.src = res.foto;
+    }
+
+    // Stats Hari (Kolom R & S)
+    if(res.stats && res.stats.hari) {
+        if(document.getElementById('h-total')) document.getElementById('h-total').innerText = res.stats.hari.total;
+        if(document.getElementById('h-on')) document.getElementById('h-on').innerText = res.stats.hari.on;
+        if(document.getElementById('h-off')) document.getElementById('h-off').innerText = res.stats.hari.off;
+        
+        // Ranking Hari (Kolom Z & AA)
+        if(document.getElementById('rk-h-on')) document.getElementById('rk-h-on').innerText = "Peringkat: " + res.stats.hari.rank_on;
+    }
+
+    // Stats Bulan (Kolom T & U)
+    if(res.stats && res.stats.bulan) {
+        if(document.getElementById('b-total')) document.getElementById('b-total').innerText = res.stats.bulan.total;
+        if(document.getElementById('b-on')) document.getElementById('b-on').innerText = res.stats.bulan.on;
+        if(document.getElementById('b-off')) document.getElementById('b-off').innerText = res.stats.bulan.off;
+    }
+
+    // Riwayat & Tarif
+    masterTarif = res.listTarif || [];
+    if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
+    
+    // Kategori Chips
+    let cats = [...new Set(masterTarif.map(x => x.kategori))];
+    const catList = document.getElementById('cat-list');
+    if (cats.length > 0 && catList) {
+        catList.innerHTML = cats.map(cat => 
+            `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+        if(typeof renderGrid === 'function') renderGrid(cats[0]);
+    }
+}
+
+// --- 5. SYSTEM ---
+function logout() {
+    localStorage.removeItem('kukami_session');
+    location.reload();
+}
+
 window.onload = function() { 
     const s = localStorage.getItem('kukami_session'); 
     if (s) { 
@@ -133,6 +183,7 @@ window.onload = function() {
         initDashboard(); 
     } 
     
+    // Auto-format input topup nominal
     const topupInput = document.getElementById('u-nom');
     if(topupInput) {
         topupInput.addEventListener('input', function() { 
