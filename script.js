@@ -1,4 +1,4 @@
-const WEB_APP_URL = "ISI_DENGAN_URL_DEPLOYMENT_GOOGLE_BOS_DI_SINI";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1DNc7CYCdaFVwVLJIMsnxqeZ2B3PxzPSJqLW5FpEJFjXbMJ9w44SQCQfkMz2VcPmB/exec";
 
 <script>
     let warnedOnce = false;
