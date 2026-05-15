@@ -1,4 +1,12 @@
 alert("Script Terbaca!");
+// Hilangkan loader secara paksa setelah 5 detik jika script macet
+setTimeout(() => {
+    const loader = document.getElementById('loader');
+    if (loader && loader.style.display !== 'none') {
+        loader.style.display = 'none';
+        alert("Koneksi lambat, mencoba memuat ulang...");
+    }
+}, 5000);
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxIrfBwErWbybUmSrgGGw88NZgq9Esdlag8DJoiDLDE8fUb_VHYlYyTt63XwJQzbt2i/exec";
 
