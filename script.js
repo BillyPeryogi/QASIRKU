@@ -1,3 +1,5 @@
+alert("Script Terbaca!");
+
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwnyxovvVjNqIWYrxAG53n3c7_dZnpuscDyxriE06yH_Ots4dpdmOuiE48wzV2hLyk3/exec";
 
 let warnedOnce = false;
@@ -21,29 +23,30 @@ function prosesLogin() {
     const pin = document.getElementById('pin').value;
     const fp = getFingerprint();
     const ua = navigator.userAgent;
+    const url = `${WEB_APP_URL}?action=login&user=${user}&pin=${pin}&fp=${fp}&ua=${ua}`;
 
-    // Ganti bagian fetch di prosesLogin atau initDashboard dengan ini
-fetch(url, {
-    method: 'GET',
-    mode: 'cors', // Paksa mode CORS
-    cache: 'no-cache', // Jangan simpan memori lama
-    headers: {
-        'Content-Type': 'application/json'
-    }
-})
-.then(res => res.json())
-// ... sisa kodenya sama
-    .then(res => {
-        showLoading(false); 
-        if(res.status === "success") { 
-            curRider = res.rider; 
-            localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-            initDashboard(); 
-        } else alert("Akses Ditolak: " + (res.message || "Pin Salah")); 
-    })
-    .catch(err => { showLoading(false); alert("Koneksi Gagal! Periksa Sinyal."); console.error(err); });
+    // MENGGUNAKAN XHR (LEBIH STABIL DI ANDROID)
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            showLoading(false);
+            if (xhr.status == 200) {
+                var res = JSON.parse(xhr.responseText);
+                if(res.status === "success") { 
+                    curRider = res.rider; 
+                    localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+                    initDashboard(); 
+                } else {
+                    alert("Akses Ditolak: " + (res.message || "Pin Salah"));
+                }
+            } else {
+                alert("Koneksi Gagal ke Server! (Code: " + xhr.status + ")");
+            }
+        }
+    };
+    xhr.send();
 }
-
 // DASHBOARD DATA
 function initDashboard() {
     document.getElementById('p-login').style.display = 'none'; 
