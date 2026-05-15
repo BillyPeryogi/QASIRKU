@@ -1,265 +1,136 @@
-alert("Script Terbaca!");
-// Hilangkan loader secara paksa setelah 5 detik jika script macet
-setTimeout(() => {
-    const loader = document.getElementById('loader');
-    if (loader && loader.style.display !== 'none') {
-        loader.style.display = 'none';
-        alert("Koneksi lambat, mencoba memuat ulang...");
-    }
-}, 5000);
+// DEBUG: Jika muncul alert ini, berarti koneksi GitHub ke APK AMAN
+alert("QASIRKU Engine v1.1 Dimuat!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxIrfBwErWbybUmSrgGGw88NZgq9Esdlag8DJoiDLDE8fUb_VHYlYyTt63XwJQzbt2i/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwtwVwGsKA4edGm6Cl-2Qnyxsk4jLyNjQICecbUhmIqkf92-oEK-L82EcsW4jSaxrWC/exec";
 
-let warnedOnce = false;
-let curRider = {}, masterTarif = [], cart = [], pendingItem = null, curNomStr = "0";
+let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
-// UTILS
-const getFingerprint = () => localStorage.getItem('kukami_fp') || (() => { let id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase(); localStorage.setItem('kukami_fp', id); return id; })();
+// --- UTILS ---
+const getFingerprint = () => localStorage.getItem('kukami_fp') || (() => { 
+    let id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase(); 
+    localStorage.setItem('kukami_fp', id); return id; 
+})();
+
 const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
-const toast = (m) => { const c = document.getElementById('toast-container'); if(c) { const d = document.createElement('div'); d.className = 'toast'; d.innerHTML = m; c.appendChild(d); setTimeout(() => d.remove(), 2500); } };
-const showLoading = (s) => { const l = document.getElementById('loader'); if(l) l.style.display = s ? 'flex' : 'none'; };
 
-// UI TABS
-const setSubTab = (n) => { document.getElementById('f-manual').style.display = (n === 1) ? 'block' : 'none'; document.getElementById('f-tarif').style.display = (n === 2) ? 'block' : 'none'; document.getElementById('tb1').className = 'tab-btn ' + (n === 1 ? 'tab-active' : 'tab-inactive'); document.getElementById('tb2').className = 'tab-btn ' + (n === 2 ? 'tab-active' : 'tab-inactive'); };
-const switchMainTab = (t) => { document.getElementById('p-home').style.display = t === 'home' ? 'block' : 'none'; document.getElementById('p-riwayat').style.display = t === 'riwayat' ? 'block' : 'none'; document.getElementById('n-home').className = 'nav-item ' + (t === 'home' ? 'active' : ''); document.getElementById('n-riwayat').className = 'nav-item ' + (t === 'riwayat' ? 'active' : ''); };
+const showLoading = (s) => { 
+    const l = document.getElementById('loader'); 
+    if(l) l.style.display = s ? 'flex' : 'none'; 
+    // Auto-stop loading setelah 12 detik agar tidak muter selamanya jika sinyal buruk
+    if(s) setTimeout(() => { if(l) l.style.display = 'none'; }, 12000);
+};
 
-// AUTH
-// AUTH
+const toast = (m) => { 
+    const c = document.getElementById('toast-container'); 
+    if(c) { 
+        const d = document.createElement('div'); 
+        d.className = 'toast'; d.innerHTML = m; 
+        c.appendChild(d); setTimeout(() => d.remove(), 2500); 
+    } 
+};
+
+// --- AUTH ---
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
     const pin = document.getElementById('pin').value;
-    const fp = getFingerprint();
-    const ua = navigator.userAgent;
-    const url = `${WEB_APP_URL}?action=login&user=${user}&pin=${pin}&fp=${fp}&ua=${ua}`;
+    
+    if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
-    // MENGGUNAKAN TEKNIK FETCH PALING AMAN UNTUK APK
-    fetch(url, {
-        method: 'GET',
-        mode: 'no-cors', 
-        cache: 'no-cache'
-    })
-    .then(() => {
-        console.log("Request Login Terkirim...");
-        // Kita beri jeda 1.5 detik agar server selesai memproses di background
-        // Lalu kita paksa jalankan initDashboard
-        setTimeout(() => {
-            // Kita coba simpan session sementara (karena no-cors tidak bisa baca respon)
-            // Di initDashboard nanti akan divalidasi ulang oleh server
-            curRider.id = user; // Set sementara agar initDashboard punya ID untuk dipanggil
+    const url = `${WEB_APP_URL}?action=login&user=${encodeURIComponent(user)}&pin=${encodeURIComponent(pin)}&fp=${getFingerprint()}&ua=${navigator.userAgent}`;
+
+    fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow' })
+    .then(res => res.json())
+    .then(res => {
+        showLoading(false);
+        if(res.status === "success") { 
+            curRider = res.rider; // Berisi ID dari Kolom A dan Nama dari Kolom B
+            localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
             initDashboard(); 
-        }, 1500);
+        } else {
+            alert("Akses Ditolak: Periksa Nama & PIN kembali.");
+        }
     })
     .catch(err => {
         showLoading(false);
-        alert("Sinyal Lemah atau Server Sibuk!");
+        alert("Gagal Terhubung ke Server Google!");
+        console.error(err);
     });
 }
 
-
-// DASHBOARD DATA
+// --- DASHBOARD ---
 function initDashboard() {
-    // 1. Pindahkan layar dulu agar tidak stuck di login
     document.getElementById('p-login').style.display = 'none'; 
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
+
+    // Ambil ID Rider (Kolom A) dari session
+    const targetId = curRider.id || JSON.parse(localStorage.getItem('kukami_session') || "{}").id;
     
-    // 2. Ambil ID dari berbagai sumber (antisipasi variabel hilang)
-    let targetId = "";
-    if (curRider && curRider.id) {
-        targetId = curRider.id;
-    } else {
-        const session = JSON.parse(localStorage.getItem('kukami_session') || "{}");
-        targetId = session.id || document.getElementById('user').value;
-    }
-
-    // Jika ID tetap tidak ada, stop loading dan balik ke login
-    if (!targetId) {
-        showLoading(false);
-        alert("ID Rider tidak terbaca, silakan login ulang.");
-        logout();
-        return;
-    }
-
-    const fetchUrl = `${WEB_APP_URL}?action=getDashboard&id=${encodeURIComponent(targetId)}`;
-
-    fetch(fetchUrl, {
-        method: 'GET',
-        mode: 'cors',
-        redirect: 'follow',
-        cache: 'no-cache'
-    })
+    fetch(`${WEB_APP_URL}?action=getDashboard&id=${targetId}`, { redirect: 'follow' })
     .then(res => res.json())
     .then(res => {
-        // MATIKAN LOADING SEGERA SETELAH DATA DATANG
-        showLoading(false); 
-        
-        if(!res || res.status === "error") {
-            alert("Rider tidak terdaftar di DB_DASHBOARD!");
-            return;
-        }
+        showLoading(false);
+        if(!res) return;
 
-        // --- RENDER DATA DASHBOARD ---
-        // (Pastikan baris ini ada agar data tampil)
-        document.getElementById('r-nama').innerHTML = `${res.sapaan || targetId}`;
+        // Render Profile & Saldo
+        document.getElementById('r-nama').innerHTML = (res.sapaan || curRider.nama || "Rider");
         document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
-        
         if(res.foto) document.getElementById('r-foto').src = res.foto;
         
-        // Stats Hari Ini
-        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
-        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
-        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
-        
-        // Stats Bulan Ini
-        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
-        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
-        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
+        // Render Stats (Hari & Bulan)
+        document.getElementById('h-total').innerText = res.stats.hari.total;
+        document.getElementById('h-on').innerText = res.stats.hari.on;
+        document.getElementById('h-off').innerText = res.stats.hari.off;
+        document.getElementById('b-total').innerText = res.stats.bulan.total;
+        document.getElementById('b-on').innerText = res.stats.bulan.on;
+        document.getElementById('b-off').innerText = res.stats.bulan.off;
 
-        masterTarif = res.listTarif || []; 
-        renderRiwayat(res.riwayat);
+        // Render Ranking
+        if(typeof updateRank === 'function') {
+            updateRank('rk-h-on', res.stats.hari.rank_on, 'hari');
+            updateRank('rk-h-off', res.stats.hari.rank_off, 'hari');
+            updateRank('rk-on', res.stats.bulan.rank_on, 'bulan');
+            updateRank('rk-off', res.stats.bulan.rank_off, 'bulan');
+        }
+
+        // Render Tarif & Riwayat
+        masterTarif = res.listTarif || [];
+        if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
         
-        // Render Chip Kategori
+        // Render Kategori Chips
         let cats = [...new Set(masterTarif.map(x => x.kategori))];
         if (cats.length > 0) {
             document.getElementById('cat-list').innerHTML = cats.map(cat => 
                 `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-            renderGrid(cats[0]);
+            if(typeof renderGrid === 'function') renderGrid(cats[0]);
         }
     })
-    .catch(err => { 
-        showLoading(false); // STOP LOADING JIKA SINYAL ERROR
-        console.error(err);
-        alert("Koneksi ke Google Sheets Gagal!");
-    });
-}
-
-
-// LOGIKA LAINNYA TETAP SAMA... (NUMPAD, GRID, DLL)
-function pressNum(v) { if (v === 'C') curNomStr = "0"; else if (v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; else { if (curNomStr === "0") curNomStr = v; else curNomStr += v; } document.getElementById('m-nom').value = "Rp " + formatRibuan(curNomStr); }
-
-function renderGrid(cat) { 
-    let f = masterTarif.filter(x => x.kategori === cat); 
-    document.getElementById('grid-list').innerHTML = f.map(i => `
-        <div class="service-card" onclick="hitService('${i.layanan}', ${i.nominal})">
-            <b>${i.layanan}</b><span>Rp ${Number(i.nominal).toLocaleString()}</span>
-        </div>`).join(''); 
-}
-
-function hitService(ket, nom) { 
-    let ketUpper = ket.toUpperCase();
-    let itemData = masterTarif.find(t => t.layanan.toUpperCase() === ketUpper);
-    let pot = itemData ? itemData.potongan : 0;
-
-    let nominalFix = (ketUpper.includes("HP ADMIN")) ? 10000 : nom;
-    let potonganFix = (ketUpper.includes("HP ADMIN")) ? 0.2 : pot;
-
-    pendingItem = { ket: ketUpper, nominal: nominalFix, qty: 1, potongan: potonganFix }; 
-    
-    if (ketUpper.includes("HP ADMIN")) {
-        finalProcess('Online', [pendingItem]); 
-    } else {
-        executeAddToCart(); 
-    }
-}
-
-function executeAddToCart() {
-    if(document.getElementById('m-confirm')) document.getElementById('m-confirm').style.display = 'none';
-    const idx = cart.findIndex(c => c.ket === pendingItem.ket);
-    if(idx > -1) cart[idx].qty++; else cart.push(pendingItem);
-    renderCart(); toast("✅ Ditambah"); curNomStr = "0"; document.getElementById('m-nom').value = "Rp 0";
-}
-
-function renderCart() { 
-    document.getElementById('cart-float').style.display = cart.length ? 'block' : 'none';
-    let tot = cart.reduce((a,c)=>a+(c.nominal*c.qty), 0);
-    document.getElementById('c-qty').innerText = cart.length; 
-    document.getElementById('c-total').innerText = "Rp " + tot.toLocaleString();
-    document.getElementById('c-list').innerHTML = cart.map((i, idx)=>`<div class="cart-row"><div style="flex:1;"><b>${i.ket}</b><br><small>Rp ${i.nominal.toLocaleString()}</small></div><div style="display:flex; align-items:center; gap:8px;"><button class="qty-btn" onclick="updateQty(${idx}, -1)">-</button><span style="font-weight:bold; min-width:20px; text-align:center;">${i.qty}</span><button class="qty-btn" onclick="updateQty(${idx}, 1)">+</button><button onclick="removeItem(${idx})" style="border:none;background:none;color:red;font-size:18px;">🗑</button></div></div>`).join('');
-}
-
-function updateQty(idx, d) { cart[idx].qty += d; if (cart[idx].qty <= 0) removeItem(idx); else renderCart(); }
-function removeItem(idx) { cart.splice(idx, 1); renderCart(); if(!cart.length) document.getElementById('m-cart').style.display = 'none'; }
-function showCart() { document.getElementById('m-cart').style.display = 'block'; renderCart(); setTimeout(cekValidasiQty, 300); }
-
-function finalProcess(tipe, overrideItems) {
-    const itemsToSubmit = overrideItems || cart;
-    if (itemsToSubmit.length === 0) return toast("⚠️ Keranjang kosong!");
-    showLoading(true);
-
-    const payload = { idRider: curRider.id, namaRider: curRider.nama, items: itemsToSubmit, tipe: tipe, deviceInfo: navigator.userAgent };
-
-    fetch(`${WEB_APP_URL}?action=saveTrx&data=${encodeURIComponent(JSON.stringify(payload))}`)
-    .then(res => res.json())
-    .then(res => {
+    .catch(err => {
         showLoading(false);
-        toast("✅ Berhasil!");
-        if (!overrideItems) { cart = []; renderCart(); }
-        initDashboard();
-        showStruk(res, payload.items);
-    })
-    .catch(err => { showLoading(false); alert("Gagal Simpan!"); });
-}
-
-function showStruk(res, items) {
-    document.getElementById('s-inv').innerText = res.nota;
-    document.getElementById('s-rider').innerText = curRider.nama;
-    let raw = res.waktu || "";
-    let clean = raw.replace(/WIB/g, "").trim(); 
-    document.getElementById('s-tgl').innerText = clean + " WIB";
-    
-    let h = ''; 
-    items.forEach(i => { 
-        h += `<div style="margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                  <span>${i.ket}</span>
-                  <span>Rp ${(i.nominal*i.qty).toLocaleString()}</span> </div>
-                <div style="font-size:10px; color:#666;">${i.qty} x Rp ${i.nominal.toLocaleString()}</div> </div>`; 
+        console.error("Dashboard Error:", err);
     });
-    document.getElementById('s-items').innerHTML = h; 
-    document.getElementById('s-total').innerText = "Rp " + res.total.toLocaleString(); 
-    document.getElementById('m-struk').style.display = 'block';
 }
 
-function renderRiwayat(data) {
-    let h = '', lastD = '';
-    if (!data || !data.length) return document.getElementById('list-riwayat').innerHTML = '<div style="padding:30px; text-align:center; color:#888;">Belum ada riwayat</div>';
-    data.forEach(i => {
-        if(i.tglDisplay !== lastD) { h += `<div class="date-separator"><span>${i.tglDisplay}</span><div class="date-line"></div></div>`; lastD = i.tglDisplay; }
-        let tClass = i.tipe.toLowerCase();
-        if (i.ket.toUpperCase().includes("HP ADMIN")) tClass = "hp";
-        h += `<div class="item-r"><div style="flex: 1; font-size: 10px;"><div style="color: #888;">${i.jam} | ${i.id}</div><div>${i.ket}</div><div><span class="hl-tag hl-${tClass}">${i.tipe}</span></div></div><div style="text-align: right;"><span style="color: #800000; font-weight: bold;">Rp ${Number(i.nom).toLocaleString()}</span></div></div>`;
-    });
-    document.getElementById('list-riwayat').innerHTML = h;
+function logout() {
+    localStorage.removeItem('kukami_session');
+    location.reload();
 }
 
-// PERBAIKAN TOPUP UNTUK GITHUB
-function saveTopUp() {
-    const nom = getAngka(document.getElementById('u-nom').value);
-    if (nom <= 0) return toast("⚠️ Isi nominal!");
-    showLoading(true);
-    
-    fetch(`${WEB_APP_URL}?action=requestTopUp&idRider=${curRider.id}&nominal=${nom}&metode=${document.getElementById('u-met').value}`)
-    .then(() => { 
-        document.getElementById('m-topup').style.display = 'none';
-        showLoading(false); 
-        toast("🚀 Terkirim!");
-        initDashboard();
-    })
-    .catch(() => showLoading(false));
-}
-
-function updateRank(id, val, tipe) { 
-    const el = document.getElementById(id);
-    if (!el) return; 
-    if (!val) { el.innerHTML = ''; return; }
-    let warna = (val <= 10) ? (tipe === 'hari' ? 'bg-rank-hari-top' : 'bg-rank-bulan-top') : 'bg-rank-grey';
-    el.innerHTML = `<span class="rank-badge ${warna}">#${val}</span>`; 
-}
-
+// --- INITIALIZE ---
 window.onload = function() { 
     const s = localStorage.getItem('kukami_session'); 
-    if (s) { curRider = JSON.parse(s); initDashboard(); } 
-    document.getElementById('u-nom').addEventListener('input', function(e) { this.value = formatRibuan(this.value); }); 
+    if (s) { 
+        curRider = JSON.parse(s); 
+        initDashboard(); 
+    } 
+    
+    // Auto-format input nominal topup
+    const topupInput = document.getElementById('u-nom');
+    if(topupInput) {
+        topupInput.addEventListener('input', function(e) { 
+            this.value = formatRibuan(this.value); 
+        });
+    }
 };
