@@ -23,35 +23,46 @@ function prosesLogin() {
     const pin = document.getElementById('pin').value;
     const fp = getFingerprint();
     const ua = navigator.userAgent;
-    
-    // Alamat lengkap ke Google Script Bos
     const url = `${WEB_APP_URL}?action=login&user=${user}&pin=${pin}&fp=${fp}&ua=${ua}`;
 
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors', // Izin lintas situs
-        redirect: 'follow' // INI KUNCINYA: Memaksa script mengikuti redirect Google
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('Respon Server Tidak OK');
-        return res.json();
-    })
-    .then(res => {
-        showLoading(false); 
-        if(res.status === "success") { 
-            curRider = res.rider; 
-            localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-            initDashboard(); 
-        } else {
-            alert("Akses Ditolak: " + (res.message || "Pin Salah")); 
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    
+    // Memaksa request agar dianggap sebagai data murni
+    xhr.setRequestHeader("Content-Type", "text/plain");
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            showLoading(false);
+            if (xhr.status == 200) {
+                try {
+                    // Terkadang Google mengirim redirect sebagai teks, kita tangkap di sini
+                    var res = JSON.parse(xhr.responseText);
+                    if(res.status === "success") { 
+                        curRider = res.rider; 
+                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+                        initDashboard(); 
+                    } else {
+                        alert("Akses Ditolak: " + (res.message || "Pin Salah"));
+                    }
+                } catch(e) {
+                    // Jika error parse, biasanya karena yang balik adalah HTML error Google
+                    alert("Respon Server Tidak Valid. Cek apakah URL GAS sudah 'Anyone'.");
+                }
+            } else {
+                alert("Gagal koneksi ke server. Code: " + xhr.status);
+            }
         }
-    })
-    .catch(err => { 
-        showLoading(false); 
-        alert("Koneksi Gagal! Pastikan URL GAS sudah benar & diset ke 'Anyone'.");
-        console.error(err); 
-    });
+    };
+    
+    xhr.onerror = function() {
+        showLoading(false);
+        alert("Koneksi diblokir oleh sistem Android/WebViewer.");
+    };
+    
+    xhr.send();
 }
+
 
 // DASHBOARD DATA
 function initDashboard() {
