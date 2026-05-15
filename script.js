@@ -40,25 +40,40 @@ function prosesLogin() {
 
     const url = `${WEB_APP_URL}?action=login&user=${encodeURIComponent(user)}&pin=${encodeURIComponent(pin)}&fp=${getFingerprint()}&ua=${navigator.userAgent}`;
 
-    fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow' })
-    .then(res => res.json())
-    .then(res => {
-        showLoading(false);
-        if(res.status === "success") { 
-            curRider = res.rider; // Berisi ID dari Kolom A dan Nama dari Kolom B
-            localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-            initDashboard(); 
-        } else {
-            alert("Akses Ditolak: Periksa Nama & PIN kembali.");
+    // MENGGUNAKAN XHR (LEBIH TEMBUS DI ANDROID)
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            showLoading(false);
+            if (xhr.status == 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if(res.status === "success") { 
+                        curRider = res.rider; 
+                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+                        alert("Login Sukses! Membuka Dashboard..."); // Debug
+                        initDashboard(); 
+                    } else {
+                        alert("Akses Ditolak: PIN Salah");
+                    }
+                } catch(e) {
+                    alert("Gagal baca data server. Pastikan GAS sudah 'Anyone'.");
+                }
+            } else {
+                alert("Koneksi Error. Code: " + xhr.status);
+            }
         }
-    })
-    .catch(err => {
-        showLoading(false);
-        alert("Gagal Terhubung ke Server Google!");
-        console.error(err);
-    });
-}
+    };
 
+    xhr.onerror = function() {
+        showLoading(false);
+        alert("Koneksi Diblokir APK! Cek IgnoreSSLErrors di MIT.");
+    };
+
+    xhr.send();
+}
 // --- DASHBOARD ---
 function initDashboard() {
     document.getElementById('p-login').style.display = 'none'; 
