@@ -1,3 +1,5 @@
+alert("Script Berhasil Dimuat!");
+
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1DNc7CYCdaFVwVLJIMsnxqeZ2B3PxzPSJqLW5FpEJFjXbMJ9w44SQCQfkMz2VcPmB/exec";
 
     let warnedOnce = false;
