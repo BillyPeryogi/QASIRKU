@@ -1,8 +1,7 @@
 // DEBUG: Jika muncul alert ini, berarti koneksi GitHub ke APK AMAN
 alert("QASIRKU Engine v1.1 Dimuat!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyE1MxgF8WDZnV2eKWUqPuaORnvliFS-LFV3K4ZC5TRMOfqhHTO0ilDMBWMZepXUJ_6/exec";
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyQ7_yolPNH3JJg40WUhY1qN4smQMHN0Ra7DFHLG827_b9muMtpQjAjM7Cy8-bqmQp/exec";
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
 // --- UTILS ---
@@ -39,7 +38,7 @@ function prosesLogin() {
     if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
     // Gunakan URL sederhana tanpa banyak embel-embel dulu
-    const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
+    const url = WEB_APP_URL + "?action=&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
