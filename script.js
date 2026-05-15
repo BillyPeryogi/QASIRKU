@@ -1,13 +1,12 @@
-/**
- * KUKAMI ENGINE v2.2 - FINAL STABLE
- * Sinkronisasi Otomatis HTML + CSS + GAS
+/** * KUKAMI ENGINE v2.3 - EMERGENCY FIX
+ * ANTI-KICKBACK & SILENT ERROR HANDLING
  */
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwB8_0wPWBjqnCawghWBGXfLmGM3yEp855P4RFOKCtem8IQmzeDZRTe4Up7h9gXPpfQ/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
-// --- 1. UTILS ---
+// --- UTILS ---
 const showLoading = (s) => { 
     const l = document.getElementById('loader'); 
     if(l) l.style.display = s ? 'flex' : 'none'; 
@@ -23,50 +22,45 @@ const getFingerprint = () => {
 };
 
 const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
 
-// --- 2. CORE LOGIN ---
+// --- LOGIN ---
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
     const pin = document.getElementById('pin').value;
     
-    if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
+    if(!user || !pin) { showLoading(false); return alert("Nama & PIN wajib diisi!"); }
 
     const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin) + "&fp=" + getFingerprint() + "&ua=" + encodeURIComponent(navigator.userAgent);
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                try {
-                    var res = JSON.parse(xhr.responseText);
-                    if(res.status === "success") { 
-                        curRider = res.rider; 
-                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                        initDashboard(); 
-                    } else {
-                        showLoading(false);
-                        alert("Akses Ditolak: " + (res.message || "Nama/PIN Salah"));
-                    }
-                } catch(e) {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if(res.status === "success") { 
+                    curRider = res.rider; 
+                    localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+                    initDashboard(); 
+                } else {
                     showLoading(false);
-                    alert("Gagal memproses data server!");
+                    alert("Akses Ditolak: Periksa Nama & PIN");
                 }
-            } else {
+            } catch(e) {
                 showLoading(false);
-                alert("Koneksi Google Bermasalah");
+                alert("Server Error: Pastikan GAS Anyone & New Version");
             }
         }
     };
     xhr.send();
 }
 
-// --- 3. DASHBOARD ENGINE (ANTI-MUTER) ---
+// --- DASHBOARD ENGINE (PASTI MASUK) ---
 function initDashboard() {
-    // Pindah layar duluan agar user tidak bosan melihat loader di login
+    // 1. PINDAH HALAMAN DULUAN (KUNCI AGAR TIDAK BALIK LOGIN)
     document.getElementById('p-login').classList.remove('active');
+    document.getElementById('p-login').style.display = 'none';
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
 
@@ -79,13 +73,13 @@ function initDashboard() {
     xhr.open("GET", WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId), true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
-            showLoading(false);
+            showLoading(false); // MATIKAN LOADING APAPUN YANG TERJADI
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
-                    renderDashboardUI(res);
+                    renderUI(res);
                 } catch(e) {
-                    console.error("Gagal render data dashboard", e);
+                    console.log("Data diterima tapi gagal render: " + e);
                 }
             }
         }
@@ -93,88 +87,65 @@ function initDashboard() {
     xhr.send();
 }
 
-// --- 4. RENDER DATA KE HTML (Sesuai ID HTML Bos) ---
-function renderDashboardUI(res) {
-    // Nama & Sapaan (Kolom B & X)
-    const elNama = document.getElementById('r-nama');
-    if(elNama) {
-        // Teks Sapaan (X) + Nama (B)
-        const sapaan = res.sapaan ? res.sapaan + ", " : "";
-        elNama.innerText = sapaan + res.namaAsli;
-    }
+// --- RENDER UI (DENGAN PENGAMAN TIAP BARIS) ---
+function renderUI(res) {
+    try {
+        // Nama & Sapaan
+        const nameEl = document.getElementById('r-nama');
+        if(nameEl) nameEl.innerText = (res.sapaan ? res.sapaan + ", " : "") + (res.namaAsli || curRider.nama);
 
-    // Saldo (Kolom Q)
-    if(document.getElementById('r-saldo')) {
-        document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
-    }
+        // Saldo
+        const saldoEl = document.getElementById('r-saldo');
+        if(saldoEl) saldoEl.innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
 
-    // Foto (Kolom D)
-    if(res.foto && document.getElementById('r-foto')) {
-        document.getElementById('r-foto').src = res.foto;
-    }
+        // Foto
+        const fotoEl = document.getElementById('r-foto');
+        if(fotoEl && res.foto) fotoEl.src = res.foto;
 
-    // Stats Hari Ini (R & S)
-    if(res.stats && res.stats.hari) {
-        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
-        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
-        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
-        
-        // Peringkat (Z) - Gunakan class rank-badge dari CSS Bos
-        const rkOn = document.getElementById('rk-h-on');
-        if(rkOn && res.stats.hari.rank_on) {
-            rkOn.innerHTML = `<span class="rank-badge bg-rank-hari-top">${res.stats.hari.rank_on}</span>`;
+        // Stats Hari Ini
+        if(res.stats && res.stats.hari) {
+            document.getElementById('h-total').innerText = res.stats.hari.total || 0;
+            document.getElementById('h-on').innerText = res.stats.hari.on || 0;
+            document.getElementById('h-off').innerText = res.stats.hari.off || 0;
+            
+            // Badge Ranking
+            const rkOn = document.getElementById('rk-h-on');
+            if(rkOn && res.stats.hari.rank_on) {
+                rkOn.innerHTML = `<span class="rank-badge bg-rank-hari-top">${res.stats.hari.rank_on}</span>`;
+            }
         }
-    }
 
-    // Stats Bulan Ini (T & U)
-    if(res.stats && res.stats.bulan) {
-        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
-        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
-        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
-    }
+        // Stats Bulan Ini
+        if(res.stats && res.stats.bulan) {
+            document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
+            document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
+            document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
+        }
 
-    // List Tarif & Kategori
-    masterTarif = res.listTarif || [];
-    const catList = document.getElementById('cat-list');
-    if(catList && masterTarif.length > 0) {
-        let cats = [...new Set(masterTarif.map(x => x.kategori))];
-        catList.innerHTML = cats.map(cat => 
-            `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-        renderGrid(cats[0]);
-    }
-}
+        // Tarif & Kategori
+        masterTarif = res.listTarif || [];
+        const catList = document.getElementById('cat-list');
+        if(catList && masterTarif.length > 0) {
+            let cats = [...new Set(masterTarif.map(x => x.kategori))];
+            catList.innerHTML = cats.map(cat => `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+            renderGrid(cats[0]);
+        }
+        
+        // Riwayat
+        if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
 
-// --- 5. FUNGSI NAVIGASI & TAB ---
-function switchMainTab(tab) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    if(tab === 'home') {
-        document.getElementById('p-home').classList.add('active');
-        document.getElementById('n-home').classList.add('active');
-    } else {
-        document.getElementById('p-riwayat').classList.add('active');
-        document.getElementById('n-riwayat').classList.add('active');
+    } catch (err) {
+        console.error("Ada elemen HTML yang tidak ditemukan: ", err);
     }
 }
 
-function setSubTab(n) {
-    const fManual = document.getElementById('f-manual');
-    const fTarif = document.getElementById('f-tarif');
-    const tb1 = document.getElementById('tb1');
-    const tb2 = document.getElementById('tb2');
-
-    if(n === 1) {
-        fManual.style.display = 'block';
-        fTarif.style.display = 'none';
-        tb1.className = 'tab-btn tab-active';
-        tb2.className = 'tab-btn tab-inactive';
-    } else {
-        fManual.style.display = 'none';
-        fTarif.style.display = 'block';
-        tb1.className = 'tab-btn tab-inactive';
-        tb2.className = 'tab-btn tab-active';
-    }
+// --- FUNGSI PENDUKUNG ---
+function pressNum(v) {
+    const input = document.getElementById('m-nom');
+    if(v === 'C') { curNomStr = "0"; }
+    else if(v === '⌫') { curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; }
+    else { curNomStr = curNomStr === "0" ? v : curNomStr + v; }
+    input.value = "Rp " + formatRibuan(curNomStr);
 }
 
 function renderGrid(cat) {
@@ -189,12 +160,25 @@ function renderGrid(cat) {
     `).join('');
 }
 
+function switchMainTab(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('p-' + tab).classList.add('active');
+    document.getElementById('n-' + tab).classList.add('active');
+}
+
+function setSubTab(n) {
+    document.getElementById('f-manual').style.display = n === 1 ? 'block' : 'none';
+    document.getElementById('f-tarif').style.display = n === 2 ? 'block' : 'none';
+    document.getElementById('tb1').className = n === 1 ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
+    document.getElementById('tb2').className = n === 2 ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
+}
+
 function logout() {
     localStorage.removeItem('kukami_session');
     location.reload();
 }
 
-// --- 6. INITIAL LOAD ---
 window.onload = function() {
     const s = localStorage.getItem('kukami_session');
     if(s) {
@@ -202,12 +186,3 @@ window.onload = function() {
         initDashboard();
     }
 };
-
-// Fungsi pendukung Kalkulator Manual
-function pressNum(v) {
-    const input = document.getElementById('m-nom');
-    if(v === 'C') { curNomStr = "0"; }
-    else if(v === '⌫') { curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; }
-    else { curNomStr = curNomStr === "0" ? v : curNomStr + v; }
-    input.value = "Rp " + formatRibuan(curNomStr);
-}
