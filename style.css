@@ -1,4 +1,4 @@
-<style>
+
     /* KUKAMI SUPERAPP v1.1 - SUPER LOCK UI - CSS TIDAK DIRUBAH */
     :root { --maroon: #800000; --navy: #000080; --gold: #D4AF37; --bg: #E5E5E5; --white: #fff; --grey: #888; --green: #28a745; --light-grey: #ccc; }
     body { font-family: sans-serif; margin: 0; background: var(--bg); user-select: none; padding-bottom: constant(safe-area-inset-bottom); /* Untuk iOS/Android modern */
@@ -135,4 +135,4 @@
   animation: pulse-red 1.5s infinite;
 }
 
-  </style>
+
