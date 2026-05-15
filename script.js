@@ -1,84 +1,93 @@
-/** * KUKAMI ENGINE v2.4 - STABLE SINKRON
- * Menyesuaikan Kolom A-AE & HTML Bos
+/** * KUKAMI ENGINE v2.5 - FINAL REPAIR
+ * Perbaikan: Sinkronisasi ID Login & Dashboard
  */
 
-alert("KUKAMI Engine v2.4 Aktif!");
+alert("KUKAMI v1.2: Jalur Cepat Aktif!");
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeLFPsug0f5PWHXlar47heQyXN0GaMyoBPwgpB3l1y3l9tnsyizwVDQKhACJDVXdxv/exec";
 
-let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
+let curRider = {}; 
 
 const showLoading = (s) => { 
     const l = document.getElementById('loader'); 
     if(l) l.style.display = s ? 'flex' : 'none'; 
 };
 
-const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
+// 1. PROSES LOGIN
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
     const pin = document.getElementById('pin').value;
-    if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
-
-    const url = WEB_APP_URL + "?action=login&user="+encodeURIComponent(user)+"&pin="+encodeURIComponent(pin)+"&fp="+localStorage.getItem('kukami_fp');
     
+    if(!user || !pin) { showLoading(false); return alert("Nama & PIN wajib diisi!"); }
+
+    // Kirim Nama (B) dan PIN (C)
+    const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            try {
-                var res = JSON.parse(xhr.responseText);
-                if(res.status === "success") {
-                    curRider = res.rider;
-                    localStorage.setItem('kukami_session', JSON.stringify(curRider));
-                    initDashboard();
-                } else {
-                    showLoading(false); alert("Gagal: " + res.message);
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if(res.status === "success") { 
+                        // KUNCI: Simpan hasil balikan dari Google (ID asli dari Kolom A)
+                        curRider = res.rider; 
+                        localStorage.setItem('kukami_session', JSON.stringify(res.rider)); 
+                        
+                        // LANGSUNG MASUK
+                        initDashboard(); 
+                    } else {
+                        showLoading(false);
+                        alert("Nama atau PIN salah!");
+                    }
+                } catch(e) {
+                    showLoading(false);
+                    alert("Format server salah, pastikan GAS New Version!");
                 }
-            } catch(e) { showLoading(false); alert("Error Server!"); }
+            } else {
+                showLoading(false);
+                alert("Gagal koneksi ke Google!");
+            }
         }
     };
     xhr.send();
 }
 
+// 2. DASHBOARD ENGINE
 function initDashboard() {
+    // Paksa layar pindah dulu agar tidak stuck muter di login
     document.getElementById('p-login').style.display = 'none';
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
 
-    // AMBIL ID DENGAN VALIDASI BERLAPIS
+    // Ambil ID dari memori
     const session = JSON.parse(localStorage.getItem('kukami_session') || "{}");
-    const targetId = curRider.id || session.id;
-
-    // Log untuk Bos cek di console kalau masih gagal
-    console.log("Mencari ID:", targetId);
+    const targetId = session.id;
 
     if(!targetId) {
-        alert("Sesi berakhir, silakan login ulang.");
+        showLoading(false);
         logout();
         return;
     }
 
-    // PASTIKAN URL TIDAK ADA TYPO
     var xhr = new XMLHttpRequest();
-    // Gunakan encodeURIComponent agar ID seperti "KKM 001" tidak rusak karena spasi
+    // Gunakan targetId yang asli dari kolom A
     xhr.open("GET", WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId), true);
-    
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
-            showLoading(false);
+            showLoading(false); // MATIKAN LOADING SEGERA
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") {
                         renderUI(res);
                     } else {
-                        // Tampilkan pesan error asli dari Google agar kita tahu ID apa yang dicari
-                        alert("Google Berkata: " + res.message);
+                        alert("Data Dashboard Gagal Dimuat: " + res.message);
                     }
                 } catch(e) {
-                    console.error("Gagal Render:", e);
+                    console.error("Render Error:", e);
                 }
             }
         }
@@ -86,47 +95,43 @@ function initDashboard() {
     xhr.send();
 }
 
+// 3. RENDER UI
 function renderUI(res) {
     try {
-        // Nama & Sapaan (Kolom B & X)
-        const nameEl = document.getElementById('r-nama');
-        if(nameEl) {
-            const txt = (res.sapaan ? res.sapaan + ", " : "") + (res.namaAsli || curRider.nama);
-            nameEl.innerText = txt;
-        }
-
-        // Saldo (Kolom Q)
-        const saldoEl = document.getElementById('r-saldo');
-        if(saldoEl) saldoEl.innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
-
-        // Foto (Kolom D)
+        // Nama & Sapaan
+        document.getElementById('r-nama').innerText = (res.sapaan ? res.sapaan + ", " : "") + res.namaAsli;
+        // Saldo
+        document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString('id-ID');
+        // Foto
         if(res.foto) document.getElementById('r-foto').src = res.foto;
+        // Stats Hari
+        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
+        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
+        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
+        // Stats Bulan
+        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
+        
+        // Peringkat
+        const rk = document.getElementById('rk-h-on');
+        if(rk) rk.innerHTML = `<span class="rank-badge bg-rank-hari-top">${res.stats.hari.rank_on || '-'}</span>`;
 
-        // Stats Hari (R, S, Z)
-        if(res.stats && res.stats.hari) {
-            document.getElementById('h-total').innerText = res.stats.hari.total;
-            document.getElementById('h-on').innerText = res.stats.hari.on;
-            document.getElementById('h-off').innerText = res.stats.hari.off;
-            const rkOn = document.getElementById('rk-h-on');
-            if(rkOn) rkOn.innerHTML = `<span class="rank-badge bg-rank-hari-top">${res.stats.hari.rank_on}</span>`;
-        }
-
-        // Stats Bulan (T, U)
-        if(res.stats && res.stats.bulan) {
-            document.getElementById('b-total').innerText = res.stats.bulan.total;
-            document.getElementById('b-on').innerText = res.stats.bulan.on;
-            document.getElementById('b-off').innerText = res.stats.bulan.off;
-        }
-
-        // Render Kategori Chips
+        // Render Tarif/Grid
         masterTarif = res.listTarif || [];
-        const catList = document.getElementById('cat-list');
-        if(catList && masterTarif.length > 0) {
+        if(masterTarif.length > 0) {
             let cats = [...new Set(masterTarif.map(x => x.kategori))];
-            catList.innerHTML = cats.map(cat => `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+            document.getElementById('cat-list').innerHTML = cats.map(cat => 
+                `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
             renderGrid(cats[0]);
         }
-    } catch(err) { console.warn("Beberapa elemen HTML tidak ditemukan."); }
+    } catch(err) {
+        console.warn("Cek ID elemen di HTML Bos!");
+    }
+}
+
+// 4. SISTEM
+function logout() {
+    localStorage.removeItem('kukami_session');
+    location.reload();
 }
 
 function renderGrid(cat) {
@@ -140,37 +145,9 @@ function renderGrid(cat) {
     `).join('');
 }
 
-function switchMainTab(tab) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    if(tab === 'home') {
-        document.getElementById('p-home').classList.add('active');
-        document.getElementById('n-home').classList.add('active');
-    } else {
-        document.getElementById('p-riwayat').classList.add('active');
-        document.getElementById('n-riwayat').classList.add('active');
-    }
-}
-
-function setSubTab(n) {
-    document.getElementById('f-manual').style.display = (n===1) ? 'block' : 'none';
-    document.getElementById('f-tarif').style.display = (n===2) ? 'block' : 'none';
-    document.getElementById('tb1').className = (n===1) ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
-    document.getElementById('tb2').className = (n===2) ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
-}
-
-function pressNum(v) {
-    const input = document.getElementById('m-nom');
-    if(v === 'C') curNomStr = "0";
-    else if(v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0";
-    else curNomStr = curNomStr === "0" ? v : curNomStr + v;
-    input.value = "Rp " + formatRibuan(curNomStr);
-}
-
-function logout() { localStorage.removeItem('kukami_session'); location.reload(); }
-
 window.onload = function() {
-    if(!localStorage.getItem('kukami_fp')) localStorage.setItem('kukami_fp', 'ID-' + Math.random().toString(36).substr(2,9).toUpperCase());
     const s = localStorage.getItem('kukami_session');
-    if(s) { curRider = JSON.parse(s); initDashboard(); }
+    if (s) {
+        initDashboard();
+    }
 };
