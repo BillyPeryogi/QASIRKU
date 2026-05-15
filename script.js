@@ -4,7 +4,7 @@
 
 alert("KUKAMI Engine v2.4 Aktif!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxzDaDnDiMxqoziXzqySt7EFmCJFo5Nj8tZ3HSSGIZZ5FtPIe7qrI2a9scYS0oVZAl6/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeLFPsug0f5PWHXlar47heQyXN0GaMyoBPwgpB3l1y3l9tnsyizwVDQKhACJDVXdxv/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
