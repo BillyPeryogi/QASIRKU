@@ -1,7 +1,8 @@
-// DEBUG: Jika muncul alert ini, berarti koneksi GitHub ke APK AMAN
-alert("QASIRKU Engine v1.1 Dimuat!");
+// DEBUG: Jika muncul alert ini, koneksi GitHub ke APK AMAN
+alert("KUKAMI Engine v1.1 Aktif!");
 
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyQ7_yolPNH3JJg40WUhY1qN4smQMHN0Ra7DFHLG827_b9muMtpQjAjM7Cy8-bqmQp/exec";
+
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
 // --- UTILS ---
@@ -16,20 +17,11 @@ const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
 const showLoading = (s) => { 
     const l = document.getElementById('loader'); 
     if(l) l.style.display = s ? 'flex' : 'none'; 
-    // Auto-stop loading setelah 12 detik agar tidak muter selamanya jika sinyal buruk
-    if(s) setTimeout(() => { if(l) l.style.display = 'none'; }, 12000);
+    // Emergency stop: Jika 15 detik masih muter, matikan paksa
+    if(s) setTimeout(() => { if(l) l.style.display = 'none'; }, 15000);
 };
 
-const toast = (m) => { 
-    const c = document.getElementById('toast-container'); 
-    if(c) { 
-        const d = document.createElement('div'); 
-        d.className = 'toast'; d.innerHTML = m; 
-        c.appendChild(d); setTimeout(() => d.remove(), 2500); 
-    } 
-};
-
-// --- AUTH ---
+// --- AUTH (PROSES LOGIN) ---
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
@@ -37,41 +29,45 @@ function prosesLogin() {
     
     if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
 
-    // Gunakan URL sederhana tanpa banyak embel-embel dulu
-    const url = WEB_APP_URL + "?action=&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
+    // Memastikan parameter action=login terkirim dengan benar
+    const params = "?action=login" + 
+                   "&user=" + encodeURIComponent(user) + 
+                   "&pin=" + encodeURIComponent(pin) + 
+                   "&fp=" + getFingerprint() + 
+                   "&ua=" + encodeURIComponent(navigator.userAgent);
+
+    const url = WEB_APP_URL + params;
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     
-    // Paksa browser untuk tidak menunggu terlalu lama
-    xhr.timeout = 15000; 
-
-    xhr.onload = function() {
-        showLoading(false);
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if(res.status === "success") { 
-                curRider = res.rider; 
-                localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                initDashboard(); 
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            showLoading(false);
+            if (xhr.status == 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if(res.status === "success") { 
+                        curRider = res.rider; 
+                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+                        initDashboard(); 
+                    } else {
+                        alert("Gagal: " + (res.message || "Nama atau PIN salah"));
+                    }
+                } catch(e) {
+                    alert("Respon Server Error! Pastikan GAS sudah di-Deploy sebagai 'Anyone'.");
+                }
             } else {
-                alert("PIN SALAH ATAU USER TIDAK ADA");
+                alert("Koneksi Error. Status: " + xhr.status);
             }
-        } catch(e) {
-            alert("GAS Berhasil dipanggil, tapi format data salah.");
         }
     };
-
+    
     xhr.onerror = function() {
         showLoading(false);
-        alert("PANGGILAN DIBLOKIR: Cek URL GAS di GitHub, pastikan tidak ada spasi!");
+        alert("Panggilan Diblokir! Cek URL GAS di script.js.");
     };
     
-    xhr.ontimeout = function() {
-        showLoading(false);
-        alert("RTO: Koneksi Google sedang sangat lambat.");
-    };
-
     xhr.send();
 }
 
@@ -81,57 +77,48 @@ function initDashboard() {
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
 
-    // Ambil ID Rider (Kolom A) dari session
     const targetId = curRider.id || JSON.parse(localStorage.getItem('kukami_session') || "{}").id;
+    const url = WEB_APP_URL + "?action=getDashboard&id=" + targetId;
     
-    fetch(`${WEB_APP_URL}?action=getDashboard&id=${targetId}`, { redirect: 'follow' })
-    .then(res => res.json())
-    .then(res => {
-        showLoading(false);
-        if(!res) return;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            showLoading(false);
+            if (xhr.status == 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    
+                    // RENDER DATA KE UI
+                    document.getElementById('r-nama').innerHTML = (res.sapaan || curRider.nama || "Rider");
+                    document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
+                    if(res.foto) document.getElementById('r-foto').src = res.foto;
+                    
+                    // Stats
+                    document.getElementById('h-total').innerText = res.stats.hari.total;
+                    document.getElementById('h-on').innerText = res.stats.hari.on;
+                    document.getElementById('h-off').innerText = res.stats.hari.off;
+                    document.getElementById('b-total').innerText = res.stats.bulan.total;
+                    document.getElementById('b-on').innerText = res.stats.bulan.on;
+                    document.getElementById('b-off').innerText = res.stats.bulan.off;
 
-        // Render Profile & Saldo
-        document.getElementById('r-nama').innerHTML = (res.sapaan || curRider.nama || "Rider");
-        document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
-        if(res.foto) document.getElementById('r-foto').src = res.foto;
-        
-        // Render Stats (Hari & Bulan)
-        document.getElementById('h-total').innerText = res.stats.hari.total;
-        document.getElementById('h-on').innerText = res.stats.hari.on;
-        document.getElementById('h-off').innerText = res.stats.hari.off;
-        document.getElementById('b-total').innerText = res.stats.bulan.total;
-        document.getElementById('b-on').innerText = res.stats.bulan.on;
-        document.getElementById('b-off').innerText = res.stats.bulan.off;
-
-        // Render Ranking
-        if(typeof updateRank === 'function') {
-            updateRank('rk-h-on', res.stats.hari.rank_on, 'hari');
-            updateRank('rk-h-off', res.stats.hari.rank_off, 'hari');
-            updateRank('rk-on', res.stats.bulan.rank_on, 'bulan');
-            updateRank('rk-off', res.stats.bulan.rank_off, 'bulan');
+                    masterTarif = res.listTarif || [];
+                    if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
+                    
+                    let cats = [...new Set(masterTarif.map(x => x.kategori))];
+                    if (cats.length > 0) {
+                        document.getElementById('cat-list').innerHTML = cats.map(cat => 
+                            `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+                        if(typeof renderGrid === 'function') renderGrid(cats[0]);
+                    }
+                } catch(e) {
+                    console.error("Gagal Render Dashboard", e);
+                }
+            }
         }
-
-        // Render Tarif & Riwayat
-        masterTarif = res.listTarif || [];
-        if(typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
-        
-        // Render Kategori Chips
-        let cats = [...new Set(masterTarif.map(x => x.kategori))];
-        if (cats.length > 0) {
-            document.getElementById('cat-list').innerHTML = cats.map(cat => 
-                `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-            if(typeof renderGrid === 'function') renderGrid(cats[0]);
-        }
-    })
-    .catch(err => {
-        showLoading(false);
-        console.error("Dashboard Error:", err);
-    });
-}
-
-function logout() {
-    localStorage.removeItem('kukami_session');
-    location.reload();
+    };
+    xhr.send();
 }
 
 // --- INITIALIZE ---
@@ -142,10 +129,9 @@ window.onload = function() {
         initDashboard(); 
     } 
     
-    // Auto-format input nominal topup
     const topupInput = document.getElementById('u-nom');
     if(topupInput) {
-        topupInput.addEventListener('input', function(e) { 
+        topupInput.addEventListener('input', function() { 
             this.value = formatRibuan(this.value); 
         });
     }
