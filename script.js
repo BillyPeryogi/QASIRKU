@@ -27,47 +27,75 @@ function prosesLogin() {
     const user = document.getElementById('user').value;
     const pin = document.getElementById('pin').value;
     
-    if(!user || !pin) { showLoading(false); return alert("Isi Nama & PIN!"); }
-
-    // Memastikan parameter action=login terkirim dengan benar
-    const params = "?action=login" + 
-                   "&user=" + encodeURIComponent(user) + 
-                   "&pin=" + encodeURIComponent(pin) + 
-                   "&fp=" + getFingerprint() + 
-                   "&ua=" + encodeURIComponent(navigator.userAgent);
-
-    const url = WEB_APP_URL + params;
+    const url = WEB_APP_URL + "?action=login&user=" + encodeURIComponent(user) + "&pin=" + encodeURIComponent(pin);
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
-            showLoading(false);
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") { 
-                        curRider = res.rider; 
+                        // Simpan data rider dengan aman
+                        curRider = res.rider || { id: user, nama: user }; 
                         localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
                         initDashboard(); 
                     } else {
-                        alert("Gagal: " + (res.message || "Nama atau PIN salah"));
+                        showLoading(false);
+                        alert("Akses Ditolak: Cek Nama & PIN");
                     }
                 } catch(e) {
-                    alert("Respon Server Error! Pastikan GAS sudah di-Deploy sebagai 'Anyone'.");
+                    showLoading(false);
+                    alert("Format Data Server Salah!");
                 }
             } else {
-                alert("Koneksi Error. Status: " + xhr.status);
+                showLoading(false);
+                alert("Server Google Tidak Merespon (Error " + xhr.status + ")");
             }
         }
     };
+    xhr.send();
+}
+
+function initDashboard() {
+    // PAKSA PINDAH HALAMAN DULUAN
+    document.getElementById('p-login').style.display = 'none'; 
+    document.getElementById('app-content').style.display = 'block';
+    showLoading(true);
+
+    const targetId = curRider.id || "Unknown";
     
-    xhr.onerror = function() {
-        showLoading(false);
-        alert("Panggilan Diblokir! Cek URL GAS di script.js.");
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId), true);
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            // APAPUN HASILNYA, LOADING HARUS MATI
+            showLoading(false); 
+            
+            if (xhr.status == 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    // Update UI (Gunakan pengecekan agar tidak crash jika data kosong)
+                    document.getElementById('r-nama').innerHTML = (res.sapaan || curRider.nama || targetId);
+                    document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
+                    
+                    if(res.stats) {
+                        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
+                        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
+                    }
+                    
+                    masterTarif = res.listTarif || [];
+                    renderRiwayat(res.riwayat);
+                    // ... sisanya aman
+                } catch(e) {
+                    console.log("Render gagal tapi layar sudah pindah.");
+                }
+            }
+        }
     };
-    
     xhr.send();
 }
 
