@@ -1,123 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#800000">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700;800&family=Roboto:wght@400&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
- </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KUKAMI Superapp</title>
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #D4AF37;
+            --gold-metallic: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            --bg-dark: #1a1a1a;
+            --text-light: #f5f5f5;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark); color: var(--text-light);
+            height: 100vh; overflow: hidden;
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center;
+            align-items: center; z-index: 9999;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid var(--maroon);
+            border-top: 5px solid var(--gold); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Login Page */
+        #p-login {
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
+            background: linear-gradient(135deg, var(--maroon) 0%, #4a0000 100%);
+        }
+        .login-card {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            padding: 30px; border-radius: 20px; width: 100%; max-width: 350px;
+            border: 1px solid rgba(212, 175, 55, 0.3); text-align: center;
+        }
+        .login-card h2 { color: var(--gold); margin-bottom: 25px; letter-spacing: 2px; }
+        .login-card input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px;
+            border: none; background: rgba(255,255,255,0.9); font-size: 16px;
+        }
+        .btn-login {
+            width: 100%; padding: 12px; margin-top: 20px; border-radius: 10px;
+            border: none; background: var(--gold-metallic); color: var(--maroon);
+            font-weight: bold; font-size: 16px; cursor: pointer;
+        }
+
+        /* App Content */
+        #app-content { display: none; height: 100vh; display: flex; flex-direction: column; }
+
+        /* Header */
+        .header {
+            background: var(--maroon); padding: 15px; display: flex;
+            align-items: center; justify-content: space-between;
+            border-bottom: 2px solid var(--gold);
+        }
+        .header .profile-section { display: flex; align-items: center; gap: 10px; }
+        .header img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold); background: #eee; }
+        .header .info { display: flex; flex-direction: column; }
+        .header .info b { font-size: 14px; color: var(--gold); }
+        .header .info span { font-size: 12px; }
+
+        /* Main Scrollable Area */
+        .main-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+
+        /* Dashboard Card */
+        .card-saldo {
+            background: linear-gradient(45deg, #4a0000, var(--maroon));
+            border-radius: 15px; padding: 20px; border: 1px solid var(--gold);
+            margin-bottom: 20px; position: relative; overflow: hidden;
+        }
+        .card-saldo::after {
+            content: ''; position: absolute; top: -50%; right: -20%;
+            width: 150px; height: 150px; background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+        }
+        .card-saldo label { font-size: 12px; color: #ccc; }
+        .card-saldo h1 { margin: 5px 0; font-size: 28px; color: var(--gold); }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box {
+            background: #2a2a2a; padding: 15px; border-radius: 12px;
+            border-left: 4px solid var(--gold);
+        }
+        .stat-box label { font-size: 11px; display: block; margin-bottom: 5px; color: #aaa; }
+        .stat-box b { font-size: 18px; color: var(--text-light); }
+
+        /* Navigation Bottom */
+        .nav-bottom {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #111; display: flex; justify-content: space-around;
+            padding: 10px 0; border-top: 1px solid var(--maroon);
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 10px; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+
+        .rank-badge {
+            background: var(--gold-metallic); color: var(--maroon);
+            padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;
+        }
+    </style>
+</head>
 <body>
-  <div id="toast-container"></div>
-  <div id="loader"><div style="border:4px solid #f3f3f3; border-top:4px solid var(--maroon); border-radius:50%; width:40px; height:40px; animation:spin 1s linear infinite;"></div></div>
 
-  <div id="p-login" class="page active">
-    <div style="text-align:center; margin-top:80px; margin-bottom:20px;"><div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:42px;letter-spacing:-3px;"><span style="color:var(--maroon);">KU</span><span style="color:var(--navy);">KAMI</span></div><span style="font-family:'Roboto',sans-serif;font-size:13px;letter-spacing:11.5px;text-indent: 8px;text-transform:lowercase;display:block;">delivery</span></div>
-    <div style="padding: 20px;"><input type="text" id="user" placeholder="Nama Rider"><input type="password" id="pin" placeholder="PIN" inputmode="numeric"><button class="btn" onclick="prosesLogin()">MASUK</button></div>
-  </div>
+    <div id="loader"><div class="spinner"></div></div>
 
-  <div id="app-content" style="display:none; padding-top: 15px;">
-    <div id="p-home" class="page active">
-      <div class="card-profile">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <img id="r-foto" style="width:55px; height:55px; border-radius:50%; border:2px solid var(--gold); object-fit: cover; background:#eee;">
-          <div style="flex:1;"><h3 id="r-nama" style="margin:0; font-size:15px;"></h3>
-            <div style="font-size:9px; color:rgba(255,255,255,0.8); margin-top:5px; line-height:1.2;">
-  <span style="display:inline-block; width:52px; vertical-align: -1px;;">HARI INI</span>: 
-  <b id="h-total">0</b> trip (ON:<b id="h-on">0</b> <span id="rk-h-on"></span> | OFF:<b id="h-off">0</b> <span id="rk-h-off"></span>)<br>
-  
-  <span style="display:inline-block; width:52px; vertical-align: -1px;; margin-top:4px;">BULAN INI</span>: 
-  <b id="b-total">0</b> trip (ON:<b id="b-on">0</b> <span id="rk-on"></span> | OFF:<b id="b-off">0</b> <span id="rk-off"></span>)
-</div>
-          </div>
-          <div style="text-align:right;">
-            <small style="font-size:10px; color:var(--gold); font-weight:bold;">SALDO</small><br>
-            <span id="r-saldo" style="font-weight:bold; font-size:14px;">Rp 0</span>
-            <button onclick="document.getElementById('m-topup').style.display='block'" style="background:var(--gold); color:white; border:none; width:22px; height:22px; border-radius:50%; margin-left:5px; font-weight:bold;">+</button>
-          </div>
+    <!-- PAGE: LOGIN -->
+    <div id="p-login">
+        <div class="login-card">
+            <h2>KUKAMI</h2>
+            <input type="text" id="user" placeholder="Nama Rider" autocomplete="off">
+            <input type="password" id="pin" placeholder="PIN" inputmode="numeric">
+            <button class="btn-login" onclick="prosesLogin()">LOG IN</button>
         </div>
-      </div>
-      <div style="display:flex; gap:10px; margin-bottom:15px;"><button id="tb1" class="tab-btn tab-active" onclick="setSubTab(1)">MANUAL</button><button id="tb2" class="tab-btn tab-inactive" onclick="setSubTab(2)">TARIF</button></div>
-      
-      <div id="f-manual">
-        <input type="text" id="m-nom" placeholder="Rp 0" readonly style="background:#fff; font-weight:bold; font-size:24px; text-align:right; border:1px solid #ddd;">
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px;">
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('1')">1</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('2')">2</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('3')">3</div>
-          <div style="grid-row: span 3; background: var(--maroon); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; border-radius: 12px;" onclick="openKetManual()">🛒</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('4')">4</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('5')">5</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('6')">6</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('7')">7</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('8')">8</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('9')">9</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('000')">000</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center;" onclick="pressNum('0')">0</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center; color:red;" onclick="pressNum('C')">C</div>
-          <div style="background:white; border:1px solid #ddd; padding:15px 0; border-radius:12px; font-size:18px; font-weight:800; text-align:center; color:red;" onclick="pressNum('⌫')">⌫</div>
+    </div>
+
+    <!-- PAGE: MAIN APP -->
+    <div id="app-content" style="display:none;">
+        <div class="header">
+            <div class="profile-section">
+                <img id="r-foto" src="" alt="Profile">
+                <div class="info">
+                    <b id="r-nama">Memuat...</b>
+                    <span id="r-kelas">Rider</span>
+                </div>
+            </div>
+            <div id="rk-h-on"></div>
         </div>
-      </div>
-      <div id="f-tarif" style="display:none;"><div id="cat-list" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; margin-bottom:15px;"></div><div id="grid-list" class="service-grid"></div></div>
+
+        <div class="main-container">
+            <!-- Home Page -->
+            <div id="p-home" class="page active">
+                <div class="card-saldo">
+                    <label>Saldo Anda</label>
+                    <h1 id="r-saldo">Rp 0</h1>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <label>Total Hari Ini</label>
+                        <b id="h-total">0</b>
+                    </div>
+                    <div class="stat-box">
+                        <label>Total Bulan Ini</label>
+                        <b id="b-total">0</b>
+                    </div>
+                    <div class="stat-box" style="border-color: #27ae60;">
+                        <label>Selesai (ON)</label>
+                        <b id="h-on">0</b>
+                    </div>
+                    <div class="stat-box" style="border-color: #e74c3c;">
+                        <label>Batal (OFF)</label>
+                        <b id="h-off">0</b>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                   <button onclick="logout()" style="background:none; border:1px solid #555; color:#888; padding:8px 20px; border-radius:20px;">Keluar Akun</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-bottom">
+            <div class="nav-item active" id="n-home" onclick="location.reload()">
+                <i>🏠</i><span>Beranda</span>
+            </div>
+            <div class="nav-item">
+                <i>🕒</i><span>Riwayat</span>
+            </div>
+            <div class="nav-item">
+                <i>💳</i><span>Top Up</span>
+            </div>
+            <div class="nav-item">
+                <i>⚙️</i><span>Akun</span>
+            </div>
+        </div>
     </div>
-    <div id="p-riwayat" class="page"><div id="list-riwayat"></div></div>
-    <div class="bottom-nav">
-      <div id="n-home" class="nav-item active" onclick="switchMainTab('home')">HOME</div>
-      <div id="n-riwayat" class="nav-item" onclick="switchMainTab('riwayat')">RIWAYAT</div>
-      <div class="nav-item" onclick="logout()">LOGOUT</div>
-    </div>
-  </div>
 
-  <div id="cart-float" style="display:none; position:fixed; bottom:95px; left:20px; right:20px; z-index:900;">
-    <div style="background: var(--green) !important; border: 2px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding:12px 20px; border-radius:50px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:white;" onclick="showCart()">
-      <span>🛒 <span id="c-qty">0</span> ITEM</span><span id="c-total">Rp 0</span>
-    </div>
-  </div>
-
-  <div id="m-cart" class="modal"><div class="m-content"><h3>KERANJANG</h3><div id="c-list" style="text-align:left;"></div><hr><div style="display:flex; gap:10px;"><button class="btn" onclick="finalProcess('Online')" style="background:#007bff; flex:1;">ONLINE</button><button class="btn" onclick="finalProcess('Offline')" style="background:#dc3545; flex:1;">OFFLINE</button></div><button class="btn" onclick="tutupKeranjang()" style="background:#666; margin-top:10px;">BATAL</button></div></div>
-  <div id="m-alert" class="modal" style="display:none; z-index:15000; background:rgba(0,0,0,0.85);"><div class="m-content" style="border:2px solid var(--gold); padding:0; width:85%;"><div style="background:var(--maroon); color:var(--gold); padding:15px; font-weight:900;">⚠️ PERIKSA KERANJANG</div><div style="padding:20px; font-weight:bold; color:#333;">Mohon di cek kembali ada tarif atau fee tambahan yang lebih dari 1 QTY!</div><div style="padding:0 20px 20px 20px;"><button class="btn" onclick="tutupAlert()" style="background:var(--maroon); color:var(--gold);">OK, SAYA MENGERTI</button></div></div></div>
-  <div id="m-confirm" class="modal"><div class="m-content"><h3>Konfirmasi</h3><p id="confirm-msg"></p><div style="display:flex; gap:10px;"><button class="btn" onclick="executeAddToCart()" style="background:#28a745; flex:1;">LANJUTKAN</button><button class="btn" onclick="closeConfirm()" style="background:#dc3545; flex:1;">BATAL</button></div></div></div>
-  <div id="m-ket-manual" class="modal"><div class="m-content"><h3 style="margin-top:0; color:var(--maroon);">Keterangan Belanja</h3><input type="text" id="m-input-ket" placeholder="Contoh: Nasi Goreng Pak Jo" autocomplete="off"><button class="btn" onclick="submitKetManual()" style="background: #28a745;">TAMBAH KE KERANJANG</button><button class="btn" onclick="document.getElementById('m-ket-manual').style.display='none'" style="background:#666; margin-top:10px;">BATAL</button></div></div>
-  <div id="m-topup" class="modal"><div class="m-content"><h3>TOP UP</h3><input type="text" id="u-nom" placeholder="Nominal Rp" inputmode="numeric"><select id="u-met"><option value="BCA">BCA - 12345678 (Admin)</option><option value="DANA">DANA - 0812345678 (Admin)</option></select><button class="btn" onclick="saveTopUp()" style="background:#28a745; margin-top:10px;">KIRIM</button><button class="btn" onclick="document.getElementById('m-topup').style.display='none'" style="background:#666; margin-top:10px;">BATAL</button></div></div>
-
-  <div id="m-struk" class="modal" style="background: white;">
-    <div id="struk-area" style="width: 280px; margin: 0 auto; padding: 25px 10px; color: #000; background: white; font-family: 'Inter', sans-serif;">
-      <div style="text-align: center;"><div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:40px;letter-spacing:-2px;"><span style="color:var(--maroon);">KU</span><span style="color:var(--navy);">KAMI</span></div>
-      <span style="font-family:'Roboto',sans-serif;font-size:9px;letter-spacing:8px;text-indent: 8px;text-transform:lowercase;display:block;">delivery</span></div>
-      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="font-size:10px; margin-bottom:15px; line-height: 1.5;">
-
-  <div style="font-size:10px; margin-bottom:20px; line-height: 1.6; color: #444; font-family: 'Inter', sans-serif;">
-  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; margin-bottom: 4px;">
-    <span>Nama Rider</span>
-    <span id="s-rider" style="font-weight: bold; color: #000;">-</span> </div>
-  
-  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; margin-bottom: 4px;">
-    <span>No. Nota</span>
-    <span id="s-inv" style="color: #000;">-</span> </div>
-  
-  <div style="display: flex; justify-content: space-between;">
-    <span>Waktu</span>
-    <span id="s-tgl" style="color: #000;">-</span> </div>
-</div>
-
-<div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-<div style="text-align: center; font-size: 14px;">### LUNAS ###</div> <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-
-      <div id="s-items" style="font-size: 12px;"></div>
-      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; font-size: 15px;">TOTAL:</span><span id="s-total" style="background-color: #FFD700; color: #000; font-weight: 900; font-size: 16px; padding: 2px 10px; border-radius: 4px;">Rp 0</span></div>
-      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="text-align: center; margin-top: 15px; font-size: 11px; font-family: sans-serif;">Jazakumullohu Khoiron Katsiron</div>
-    </div>
-    <div style="padding: 10px 20px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; gap: 10px;"><button class="btn" style="background: #5d0000; flex: 1;" onclick="printStruk()">SIMPAN</button><button class="btn" style="background: #25D366; flex: 1;" onclick="shareStruk()">KIRIM STRUK</button></div>
-      <button class="btn" onclick="closeStruk()" style="background: #666; width: 100%;">TUTUP</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
