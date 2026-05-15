@@ -60,21 +60,34 @@ function prosesLogin() {
 
 // DASHBOARD DATA
 function initDashboard() {
+    // 1. Pastikan tampilan berpindah dulu agar tidak terjebak di layar login
     document.getElementById('p-login').style.display = 'none'; 
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
     
-    fetch(`${WEB_APP_URL}?action=getDashboard&id=${curRider.id}`)
-    .then(res => res.json())
+    // 2. Gunakan URL yang bersih. Pastikan curRider.id tidak kosong
+    const targetId = curRider.id || localStorage.getItem('kukami_user_temp');
+    const fetchUrl = `${WEB_APP_URL}?action=getDashboard&id=${targetId}`;
+
+    fetch(fetchUrl, {
+        method: 'GET',
+        mode: 'cors',
+        redirect: 'follow', // INI KUNCI UTAMA: Memaksa WebViewer ikuti redirect Google
+        cache: 'no-cache'
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Server Error");
+        return res.json();
+    })
     .then(res => {
         showLoading(false);
         if(!res || res.status === "error") {
-            // Jika gagal, mungkin session hilang, kembalikan ke login
-            document.getElementById('p-login').style.display = 'block';
-            document.getElementById('app-content').style.display = 'none';
+            alert("Sesi Berakhir / Rider Tidak Ditemukan");
+            logout(); // Kembalikan ke login jika data tidak ada
             return;
         }
 
+        // --- LOGIKA RENDER DATA ---
         const perfMap = {
             "TOP PERFORM": { icon: "💎", class: "anim-diamond" },
             "TOP PERFORMER": { icon: "💎", class: "anim-diamond" },
@@ -88,10 +101,12 @@ function initDashboard() {
         let dataPerf = perfMap[statusRider] || { icon: "👤", class: "" };
         let badgeHtml = `<span class="perf-icon ${dataPerf.class}">${dataPerf.icon}</span>`;
         
-        document.getElementById('r-nama').innerHTML = `${curRider.nama} ${badgeHtml}`;
+        // Render Nama & Saldo
+        document.getElementById('r-nama').innerHTML = `${curRider.nama || targetId} ${badgeHtml}`;
         document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
         if(res.foto) document.getElementById('r-foto').src = res.foto;
         
+        // Render Stats
         document.getElementById('h-total').innerText = res.stats.hari.total;
         document.getElementById('h-on').innerText = res.stats.hari.on;
         document.getElementById('h-off').innerText = res.stats.hari.off;
@@ -99,24 +114,29 @@ function initDashboard() {
         document.getElementById('b-on').innerText = res.stats.bulan.on;
         document.getElementById('b-off').innerText = res.stats.bulan.off;
         
+        // Render Rank
         updateRank('rk-h-on', res.stats.hari.rank_on, 'hari');
         updateRank('rk-h-off', res.stats.hari.rank_off, 'hari');
         updateRank('rk-on', res.stats.bulan.rank_on, 'bulan');
         updateRank('rk-off', res.stats.bulan.rank_off, 'bulan');
 
+        // Render Tarif & Riwayat
         masterTarif = res.listTarif || []; 
         renderRiwayat(res.riwayat);
         
         let cats = [...new Set(masterTarif.map(x => x.kategori))];
         if (cats.length > 0) {
-        document.getElementById('cat-list').innerHTML = cats.map(cat => 
-          `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-        if (typeof renderGrid === 'function') renderGrid(cats[0]);
-      }
+            document.getElementById('cat-list').innerHTML = cats.map(cat => 
+                `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
+            if (typeof renderGrid === 'function') renderGrid(cats[0]);
+        }
     })
-    .catch(err => { showLoading(false); console.error(err); }); // Penutup yang benar
+    .catch(err => { 
+        showLoading(false); // Pastikan loading berhenti meskipun error
+        console.error("Gagal tarik data:", err);
+        alert("Gagal Sinkronisasi Dashboard. Cek koneksi internet Anda.");
+    });
 }
-
 // LOGIKA LAINNYA TETAP SAMA... (NUMPAD, GRID, DLL)
 function pressNum(v) { if (v === 'C') curNomStr = "0"; else if (v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; else { if (curNomStr === "0") curNomStr = v; else curNomStr += v; } document.getElementById('m-nom').value = "Rp " + formatRibuan(curNomStr); }
 
