@@ -38,10 +38,12 @@ function prosesLogin() {
                 try {
                     var res = JSON.parse(xhr.responseText);
                     if(res.status === "success") { 
-                        // Simpan data rider dengan aman
-                        curRider = res.rider || { id: user, nama: user }; 
-                        localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
-                        initDashboard(); 
+    // Ambil data rider yang dikirim GAS (Penting: res.rider.id harus ada isinya)
+    curRider = res.rider; 
+    localStorage.setItem('kukami_session', JSON.stringify(curRider)); 
+    
+    alert("Selamat Datang, " + curRider.nama); // Tambahkan alert ini untuk tes
+    initDashboard();
                     } else {
                         showLoading(false);
                         alert("Akses Ditolak: Cek Nama & PIN");
