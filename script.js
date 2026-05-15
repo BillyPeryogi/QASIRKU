@@ -1,6 +1,5 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1DNc7CYCdaFVwVLJIMsnxqeZ2B3PxzPSJqLW5FpEJFjXbMJ9w44SQCQfkMz2VcPmB/exec";
 
-<script>
     let warnedOnce = false;
     let curRider = {}, masterTarif = [], cart = [], pendingItem = null, curNomStr = "0";
 
@@ -367,4 +366,4 @@ function updateRank(id, val, tipe) {
   el.innerHTML = `<span class="rank-badge ${warna}">#${val}</span>`; 
 }
 
-  </script>
+
