@@ -6,7 +6,7 @@
 
 alert("KUKAMI Engine v1.2 Aktif!");
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwE4LkruNYREKjKj2-5CYC96PQxO7McyzZNo3qKiagNa0C_lHTerD-mD8qUmzKsFav6/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaiD8Bf1081aih6JvO28MBmWMkPttOsL0Yj8uXX8MeeTrygS8gebvJ6sfCVSR9ch6M/exec";
 
 let curRider = {}, masterTarif = [], cart = [], curNomStr = "0";
 
@@ -120,13 +120,22 @@ function initDashboard() {
 
 // --- 4. RENDER UI DATA ---
 function renderUI(res) {
-    // Nama & Sapaan (Kolom B & X)
     const elNama = document.getElementById('r-nama');
     if(elNama) {
-        // Tampilkan "Pagi, NamaRider" jika ada sapaan (X), jika tidak tampilkan Nama (B)
-        elNama.innerText = res.sapaan ? res.sapaan + ", " + res.namaAsli : res.namaAsli;
+        // Logika: Jika ada Sapaan di kolom X, tampilkan "Sapaan, NamaAsli"
+        // Jika kolom X kosong, tampilkan NamaAsli saja.
+        let teksHeader = "";
+        if (res.sapaan && res.sapaan.trim() !== "") {
+            teksHeader = res.sapaan + ", " + res.namaAsli;
+        } else {
+            teksHeader = res.namaAsli;
+        }
+        
+        elNama.innerText = teksHeader;
     }
-
+    
+    // Matikan loading di akhir render
+    showLoading(false);
     // Saldo (Kolom Q)
     const elSaldo = document.getElementById('r-saldo');
     if(elSaldo) {
