@@ -60,83 +60,82 @@ function prosesLogin() {
 
 // DASHBOARD DATA
 function initDashboard() {
-    // 1. Pastikan tampilan berpindah dulu agar tidak terjebak di layar login
+    // 1. Pindahkan layar dulu agar tidak stuck di login
     document.getElementById('p-login').style.display = 'none'; 
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
     
-    // 2. Gunakan URL yang bersih. Pastikan curRider.id tidak kosong
-    const targetId = curRider.id || localStorage.getItem('kukami_user_temp');
-    const fetchUrl = `${WEB_APP_URL}?action=getDashboard&id=${targetId}`;
+    // 2. Ambil ID dari berbagai sumber (antisipasi variabel hilang)
+    let targetId = "";
+    if (curRider && curRider.id) {
+        targetId = curRider.id;
+    } else {
+        const session = JSON.parse(localStorage.getItem('kukami_session') || "{}");
+        targetId = session.id || document.getElementById('user').value;
+    }
+
+    // Jika ID tetap tidak ada, stop loading dan balik ke login
+    if (!targetId) {
+        showLoading(false);
+        alert("ID Rider tidak terbaca, silakan login ulang.");
+        logout();
+        return;
+    }
+
+    const fetchUrl = `${WEB_APP_URL}?action=getDashboard&id=${encodeURIComponent(targetId)}`;
 
     fetch(fetchUrl, {
         method: 'GET',
         mode: 'cors',
-        redirect: 'follow', // INI KUNCI UTAMA: Memaksa WebViewer ikuti redirect Google
+        redirect: 'follow',
         cache: 'no-cache'
     })
+    .then(res => res.json())
     .then(res => {
-        if (!res.ok) throw new Error("Server Error");
-        return res.json();
-    })
-    .then(res => {
-        showLoading(false);
+        // MATIKAN LOADING SEGERA SETELAH DATA DATANG
+        showLoading(false); 
+        
         if(!res || res.status === "error") {
-            alert("Sesi Berakhir / Rider Tidak Ditemukan");
-            logout(); // Kembalikan ke login jika data tidak ada
+            alert("Rider tidak terdaftar di DB_DASHBOARD!");
             return;
         }
 
-        // --- LOGIKA RENDER DATA ---
-        const perfMap = {
-            "TOP PERFORM": { icon: "💎", class: "anim-diamond" },
-            "TOP PERFORMER": { icon: "💎", class: "anim-diamond" },
-            "PERFORM": { icon: "🛡️", class: "" },
-            "PERFORMER": { icon: "🛡️", class: "" },
-            "UNDERPERFORM": { icon: "🚨", class: "anim-red" },
-            "UNDERPERFORMER": { icon: "🚨", class: "anim-red" }
-        };
-
-        let statusRider = res.kelas ? res.kelas.toUpperCase().trim() : "";
-        let dataPerf = perfMap[statusRider] || { icon: "👤", class: "" };
-        let badgeHtml = `<span class="perf-icon ${dataPerf.class}">${dataPerf.icon}</span>`;
-        
-        // Render Nama & Saldo
-        document.getElementById('r-nama').innerHTML = `${curRider.nama || targetId} ${badgeHtml}`;
+        // --- RENDER DATA DASHBOARD ---
+        // (Pastikan baris ini ada agar data tampil)
+        document.getElementById('r-nama').innerHTML = `${res.sapaan || targetId}`;
         document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
+        
         if(res.foto) document.getElementById('r-foto').src = res.foto;
         
-        // Render Stats
-        document.getElementById('h-total').innerText = res.stats.hari.total;
-        document.getElementById('h-on').innerText = res.stats.hari.on;
-        document.getElementById('h-off').innerText = res.stats.hari.off;
-        document.getElementById('b-total').innerText = res.stats.bulan.total;
-        document.getElementById('b-on').innerText = res.stats.bulan.on;
-        document.getElementById('b-off').innerText = res.stats.bulan.off;
+        // Stats Hari Ini
+        document.getElementById('h-total').innerText = res.stats.hari.total || 0;
+        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
+        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
         
-        // Render Rank
-        updateRank('rk-h-on', res.stats.hari.rank_on, 'hari');
-        updateRank('rk-h-off', res.stats.hari.rank_off, 'hari');
-        updateRank('rk-on', res.stats.bulan.rank_on, 'bulan');
-        updateRank('rk-off', res.stats.bulan.rank_off, 'bulan');
+        // Stats Bulan Ini
+        document.getElementById('b-total').innerText = res.stats.bulan.total || 0;
+        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
+        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
 
-        // Render Tarif & Riwayat
         masterTarif = res.listTarif || []; 
         renderRiwayat(res.riwayat);
         
+        // Render Chip Kategori
         let cats = [...new Set(masterTarif.map(x => x.kategori))];
         if (cats.length > 0) {
             document.getElementById('cat-list').innerHTML = cats.map(cat => 
                 `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-            if (typeof renderGrid === 'function') renderGrid(cats[0]);
+            renderGrid(cats[0]);
         }
     })
     .catch(err => { 
-        showLoading(false); // Pastikan loading berhenti meskipun error
-        console.error("Gagal tarik data:", err);
-        alert("Gagal Sinkronisasi Dashboard. Cek koneksi internet Anda.");
+        showLoading(false); // STOP LOADING JIKA SINYAL ERROR
+        console.error(err);
+        alert("Koneksi ke Google Sheets Gagal!");
     });
 }
+
+
 // LOGIKA LAINNYA TETAP SAMA... (NUMPAD, GRID, DLL)
 function pressNum(v) { if (v === 'C') curNomStr = "0"; else if (v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; else { if (curNomStr === "0") curNomStr = v; else curNomStr += v; } document.getElementById('m-nom').value = "Rp " + formatRibuan(curNomStr); }
 
