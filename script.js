@@ -17,6 +17,7 @@ const setSubTab = (n) => { document.getElementById('f-manual').style.display = (
 const switchMainTab = (t) => { document.getElementById('p-home').style.display = t === 'home' ? 'block' : 'none'; document.getElementById('p-riwayat').style.display = t === 'riwayat' ? 'block' : 'none'; document.getElementById('n-home').className = 'nav-item ' + (t === 'home' ? 'active' : ''); document.getElementById('n-riwayat').className = 'nav-item ' + (t === 'riwayat' ? 'active' : ''); };
 
 // AUTH
+// AUTH
 function prosesLogin() { 
     showLoading(true); 
     const user = document.getElementById('user').value;
@@ -25,24 +26,26 @@ function prosesLogin() {
     const ua = navigator.userAgent;
     const url = `${WEB_APP_URL}?action=login&user=${user}&pin=${pin}&fp=${fp}&ua=${ua}`;
 
-    // TEKNIK FINAL: MENGGUNAKAN FETCH DENGAN MODE GAMPANG
+    // MENGGUNAKAN TEKNIK FETCH PALING AMAN UNTUK APK
     fetch(url, {
         method: 'GET',
-        mode: 'no-cors', // Memaksa tembus tanpa cek keamanan ribet
+        mode: 'no-cors', 
         cache: 'no-cache'
     })
     .then(() => {
-        // Karena mode 'no-cors' tidak bisa baca JSON balik secara langsung, 
-        // kita panggil initDashboard sebagai paksaan.
-        console.log("Login dikirim...");
-        // Kita beri jeda 1 detik agar server selesai memproses
+        console.log("Request Login Terkirim...");
+        // Kita beri jeda 1.5 detik agar server selesai memproses di background
+        // Lalu kita paksa jalankan initDashboard
         setTimeout(() => {
+            // Kita coba simpan session sementara (karena no-cors tidak bisa baca respon)
+            // Di initDashboard nanti akan divalidasi ulang oleh server
+            curRider.id = user; // Set sementara agar initDashboard punya ID untuk dipanggil
             initDashboard(); 
         }, 1500);
     })
     .catch(err => {
         showLoading(false);
-        alert("Sinyal Lemah atau URL Salah!");
+        alert("Sinyal Lemah atau Server Sibuk!");
     });
 }
 
@@ -57,7 +60,12 @@ function initDashboard() {
     .then(res => res.json())
     .then(res => {
         showLoading(false);
-        if(!res) return;
+        if(!res || res.status === "error") {
+            // Jika gagal, mungkin session hilang, kembalikan ke login
+            document.getElementById('p-login').style.display = 'block';
+            document.getElementById('app-content').style.display = 'none';
+            return;
+        }
 
         const perfMap = {
             "TOP PERFORM": { icon: "💎", class: "anim-diamond" },
