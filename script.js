@@ -43,27 +43,43 @@ function prosesLogin() {
 }
 
 function initDashboard() {
-    // 1. PINDAH HALAMAN DULUAN (ANTI-KICKBACK)
     document.getElementById('p-login').style.display = 'none';
     document.getElementById('app-content').style.display = 'block';
     showLoading(true);
 
+    // AMBIL ID DENGAN VALIDASI BERLAPIS
     const session = JSON.parse(localStorage.getItem('kukami_session') || "{}");
     const targetId = curRider.id || session.id;
 
-    if(!targetId) { location.reload(); return; }
+    // Log untuk Bos cek di console kalau masih gagal
+    console.log("Mencari ID:", targetId);
 
+    if(!targetId) {
+        alert("Sesi berakhir, silakan login ulang.");
+        logout();
+        return;
+    }
+
+    // PASTIKAN URL TIDAK ADA TYPO
     var xhr = new XMLHttpRequest();
+    // Gunakan encodeURIComponent agar ID seperti "KKM 001" tidak rusak karena spasi
     xhr.open("GET", WEB_APP_URL + "?action=getDashboard&id=" + encodeURIComponent(targetId), true);
+    
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             showLoading(false);
             if (xhr.status == 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
-                    if(res.status === "success") renderUI(res);
-                    else alert(res.message);
-                } catch(e) { console.error("Render Error", e); }
+                    if(res.status === "success") {
+                        renderUI(res);
+                    } else {
+                        // Tampilkan pesan error asli dari Google agar kita tahu ID apa yang dicari
+                        alert("Google Berkata: " + res.message);
+                    }
+                } catch(e) {
+                    console.error("Gagal Render:", e);
+                }
             }
         }
     };
