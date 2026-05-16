@@ -559,7 +559,7 @@
         const canvas = await html2canvas(area, { scale: 2 });
         canvas.toBlob(async (blob) => {
           const file = new File([blob], 'Struk_KUKAMI.png', { type: 'image/png' });
-          if (navigator.share) { await navigator.share({ files: [file], text: '*KUKAMI DELIVERY*\nBukti transaksi berhasil.', title: 'Struk KUKAMI' }); }
+          if (navigator.share) { await navigator.share({ files: [file], text: 'Amanah akan segera disampaikan...mohon ditunggu ya ka...', title: 'Struk KUKAMI' }); }
           else { toast("⚠️ Browser tidak dukung share."); }
           showLoading(false);
         });
