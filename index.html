@@ -1,43 +1,90 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#800000"> <title>KUKAMI SUPERAPP</title>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no,
+                 viewport-fit=cover">
 
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Mengunci agar layar tidak bisa ditarik/mantul */
-            background-color: #E5E5E5; /* Warna background saat loading */
-        }
+  <meta name="theme-color" content="#800000">
 
-        .app-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+  <title>KUKAMI SUPERAPP</title>
 
-        /* 🌟 RAHASIA MENGHILANGKAN BANNER GOOGLE 🌟 */
-        iframe {
-            position: absolute;
-            top: -28px; /* Menarik layar ke atas sebesar 28px untuk memotong banner */
-            left: 0;
-            width: 100%;
-            height: calc(100% + 28px); /* Mengembalikan tinggi yang hilang di bawah */
-            border: none;
-        }
-    </style>
+  <style>
+
+    body{
+      margin:0;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      background:#E5E5E5;
+      font-family:sans-serif;
+    }
+
+    .logo{
+      font-size:48px;
+      font-weight:900;
+      letter-spacing:-3px;
+    }
+
+    .maroon{
+      color:#800000;
+    }
+
+    .navy{
+      color:#000080;
+    }
+
+    .sub{
+      margin-top:-4px;
+      letter-spacing:10px;
+      font-size:12px;
+      color:#555;
+    }
+
+    .loader{
+      width:42px;
+      height:42px;
+      border:4px solid #ddd;
+      border-top:4px solid #800000;
+      border-radius:50%;
+      margin-top:28px;
+      animation:spin 1s linear infinite;
+    }
+
+    @keyframes spin{
+      100%{
+        transform:rotate(360deg);
+      }
+    }
+
+  </style>
 </head>
+
 <body>
 
-    <div class="app-container">
-        <iframe src="https://script.google.com/macros/s/AKfycbwfebQ8V1-2Iw9O4x_hLD4Wv_TqFhmz0zK_G2IhyjD9V6M9h_WM-r3caSQespQuncpa2g/exec"></iframe>
-    </div>
+  <div class="logo">
+    <span class="maroon">KU</span><span class="navy">KAMI</span>
+  </div>
+
+  <div class="sub">delivery</div>
+
+  <div class="loader"></div>
+
+  <script>
+
+    // REDIRECT FULL PAGE
+    window.location.replace(
+      "https://script.google.com/macros/s/AKfycbwfebQ8V1-2Iw9O4x_hLD4Wv_TqFhmz0zK_G2IhyjD9V6M9h_WM-r3caSQespQuncpa2g/exec"
+    );
+
+  </script>
 
 </body>
 </html>
