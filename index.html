@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#800000"> <title>KUKAMI SUPERAPP</title>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Mengunci agar layar tidak bisa ditarik/mantul */
+            background-color: #E5E5E5; /* Warna background saat loading */
+        }
+
+        .app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 🌟 RAHASIA MENGHILANGKAN BANNER GOOGLE 🌟 */
+        iframe {
+            position: absolute;
+            top: -28px; /* Menarik layar ke atas sebesar 28px untuk memotong banner */
+            left: 0;
+            width: 100%;
+            height: calc(100% + 28px); /* Mengembalikan tinggi yang hilang di bawah */
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <iframe src="https://script.google.com/macros/s/AKfycbwfebQ8V1-2Iw9O4x_hLD4Wv_TqFhmz0zK_G2IhyjD9V6M9h_WM-r3caSQespQuncpa2g/exec"></iframe>
+    </div>
+
+</body>
+</html>
