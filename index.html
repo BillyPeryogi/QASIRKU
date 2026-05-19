@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700;800&family=Roboto:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;600;700;800&family=Roboto:wght@400&display=swap" rel="stylesheet">
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    /* KUKAMI SUPERAPP v1.1 - SUPER LOCK UI - CSS TIDAK DIRUBAH */
+    /* KUKAMI SUPERAPP v1.1 - SUPER LOCK UI - CSS INDAH TERKUNCI MATI */
     :root { --maroon: #800000; --navy: #000080; --gold: #D4AF37; --bg: #E5E5E5; --white: #fff; --grey: #888; --green: #28a745; --light-grey: #ccc; }
-    body { font-family: sans-serif; margin: 0; background: var(--bg); user-select: none; padding-bottom: constant(safe-area-inset-bottom); /* Untuk iOS/Android modern */
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-bottom: 90px; /* Tambahan jarak aman agar tidak tertutup tombol HP */}
+    body { font-family: sans-serif; margin: 0; background: var(--bg); user-select: none; padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom); padding-bottom: 90px; }
     .page { display: none; padding: 15px; } .active { display: block; }
     .rank-hl { background: yellow; color: #000; padding: 0 4px; border-radius: 4px; font-weight: 900; font-size: 10px; margin-left: 2px; }
     .chip { display: flex; align-items: center; justify-content: center; text-align: center; min-width: 100px; padding: 10px 15px; background: #D1D1D1; border-radius: 12px; font-size: 11px; font-weight: 900; color: #444; cursor: pointer; border: 1px solid #ccc; line-height: 1.2; white-space: normal; }
@@ -44,96 +45,17 @@
     .qty-btn { background: #eee; border: none; width: 30px; height: 30px; border-radius: 6px; font-weight: bold; }
     #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 40000; width: 85%; pointer-events: none; }
     .toast { background: rgba(0,0,0,0.85); color: white; padding: 12px 20px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; font-weight: 600; text-align: center; border-left: 5px solid var(--gold); }
-
-  /* --- OPERASI PLASTIK: Dari Bulat jadi Stabilo --- */
-.rank-badge {
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: bold;
-  color: #000;
-  display: inline-block;
-  margin-left: 4px;
-  vertical-align: middle;
-}
-
-/* Warna Stabilo Gold (Top 10 Harian) */
-.bg-rank-hari-top { 
-  background: linear-gradient(to right, #FFD700, #FFA500); 
-}
-
-/* Warna Stabilo Kuning (Top 10 Bulanan) */
-.bg-rank-bulan-top { 
-  background: #FFFF00; 
-}
-
-/* Warna Stabilo Abu-abu (Peringkat 11 Keatas) */
-.bg-rank-grey { 
-  background: #E5E7EB; 
-  color: #4B5563; 
-}
-
-/* --- CSS UNTUK MERAPIKAN LABEL --- */
-.label-wrapper {
-  display: inline-block;
-  width: 85px;
-  font-weight: bold;
-}
-
-/* ICON PERFORMA */
-.perf-icon {
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 4px;
-  line-height: 1;
-  vertical-align: 4px;
-}
-
-/* Memastikan container nama rata tengah */
-#r-nama {
-  display: flex;
-  align-items: center;
-  margin: 0 0 5px 0;
-  line-height: 1.2;
-}
-
-#r-nama {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-/* Efek Berkilau untuk Diamond */
-@keyframes shine {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-/* Efek Berdenyut untuk Red Alert */
-@keyframes pulse-red {
-  0% { transform: scale(1); filter: drop-shadow(0 0 0px red); }
-  50% { transform: scale(1.2); filter: drop-shadow(0 0 5px red); }
-  100% { transform: scale(1); filter: drop-shadow(0 0 0px red); }
-}
-
-.perf-icon {
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 5px;
-  position: relative;
-  top: 0px;
-  line-height: 0;
-}
-
-.anim-diamond {
-  animation: shine 2s infinite ease-in-out;
-}
-
-.anim-red {
-  animation: pulse-red 1.5s infinite;
-}
-
+    .rank-badge { padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #000; display: inline-block; margin-left: 4px; vertical-align: middle; }
+    .bg-rank-hari-top { background: linear-gradient(to right, #FFD700, #FFA500); }
+    .bg-rank-bulan-top { background: #FFFF00; }
+    .bg-rank-grey { background: #E5E7EB; color: #4B5563; }
+    .label-wrapper { display: inline-block; width: 85px; font-weight: bold; }
+    .perf-icon { display: inline-block; font-size: 14px; margin-left: 4px; line-height: 1; vertical-align: 4px; position: relative; top: 0px; }
+    #r-nama { display: flex; align-items: center; margin: 0 0 5px 0; line-height: 1.2; flex-wrap: nowrap; }
+    @keyframes shine { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes pulse-red { 0% { transform: scale(1); filter: drop-shadow(0 0px red); } 50% { transform: scale(1.2); filter: drop-shadow(0 5px red); } 100% { transform: scale(1); filter: drop-shadow(0 0px red); } }
+    .anim-diamond { animation: shine 2s infinite ease-in-out; }
+    .anim-red { animation: pulse-red 1.5s infinite; }
   </style>
 </head>
 <body>
@@ -142,6 +64,7 @@
 
   <div id="p-login" class="page active">
     <div style="text-align:center; margin-top:80px; margin-bottom:20px;"><div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:42px;letter-spacing:-3px;"><span style="color:var(--maroon);">KU</span><span style="color:var(--navy);">KAMI</span></div><span style="font-family:'Roboto',sans-serif;font-size:13px;letter-spacing:11.5px;text-indent: 8px;text-transform:lowercase;display:block;">delivery</span></div>
+    <div id="debug-layar" style="background:var(--maroon); color:var(--gold); padding:10px; font-weight:bold; font-size:12px; border-radius:10px; margin-bottom:10px; border:1px solid var(--gold); text-align:center;">READY ENGINE V2.5 (ES5 STABLE)</div>
     <div style="padding: 20px;"><input type="text" id="user" placeholder="Nama Rider"><input type="password" id="pin" placeholder="PIN" inputmode="numeric"><button class="btn" onclick="prosesLogin()">MASUK</button></div>
   </div>
 
@@ -150,15 +73,31 @@
       <div class="card-profile">
         <div style="display:flex; align-items:center; gap:12px;">
           <img id="r-foto" style="width:55px; height:55px; border-radius:50%; border:2px solid var(--gold); object-fit: cover; background:#eee;">
-          <div style="flex:1;"><h3 id="r-nama" style="margin:0; font-size:15px;"></h3>
-            <div style="font-size:9px; color:rgba(255,255,255,0.8); margin-top:5px; line-height:1.2;">
-  <span style="display:inline-block; width:52px; vertical-align: -1px;;">HARI INI</span>: 
-  <b id="h-total">0</b> trip (ON:<b id="h-on">0</b> <span id="rk-h-on"></span> | OFF:<b id="h-off">0</b> <span id="rk-h-off"></span>)<br>
+          <div style="flex:1;">
+  <h3 id="r-nama" style="margin:0; font-size:15px; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);"></h3>
   
-  <span style="display:inline-block; width:52px; vertical-align: -1px;; margin-top:4px;">BULAN INI</span>: 
-  <b id="b-total">0</b> trip (ON:<b id="b-on">0</b> <span id="rk-on"></span> | OFF:<b id="b-off">0</b> <span id="rk-off"></span>)
-</div>
-          </div>
+  <div style="font-size: 9px; color: rgba(255,255,255,0.9); margin-top: 6px; line-height: 1.4; font-family: 'Inter', sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; padding-bottom: 0px; margin-bottom: 0px;">
+      <div>
+        <span style="display:inline-block; width:52px; font-weight: 800; color: #FFD700;">HARI INI</span>: 
+        <b id="h-trip">0</b> <span style="color:#FFD700">#<span id="h-rank">-</span></span> 
+        (ON: <b id="h-on">0</b> <span style="color:#FFD700">#<span id="h-rank-on">-</span></span> | 
+        OFF: <b id="h-off">0</b> <span style="color:#FFD700">#<span id="h-rank-off">-</span></span>)
+      </div>      
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <div>
+        <span style="display:inline-block; width:52px; font-weight: 800; color: #FFD700;">BULAN INI</span>: 
+        <b id="b-trip">0</b> <span style="color:#FFD700">#<span id="b-rank">-</span></span> 
+        (ON: <b id="b-on">0</b> <span style="color:#FFD700">#<span id="b-rank-on">-</span></span> | 
+        OFF: <b id="b-off">0</b> <span style="color:#FFD700">#<span id="b-rank-off">-</span></span>)
+      </div>      
+    </div>
+
+  </div>
+  </div>
           <div style="text-align:right;">
             <small style="font-size:10px; color:var(--gold); font-weight:bold;">SALDO</small><br>
             <span id="r-saldo" style="font-weight:bold; font-size:14px;">Rp 0</span>
@@ -207,248 +146,290 @@
   <div id="m-alert" class="modal" style="display:none; z-index:15000; background:rgba(0,0,0,0.85);"><div class="m-content" style="border:2px solid var(--gold); padding:0; width:85%;"><div style="background:var(--maroon); color:var(--gold); padding:15px; font-weight:900;">⚠️ PERIKSA KERANJANG</div><div style="padding:20px; font-weight:bold; color:#333;">Mohon di cek kembali ada tarif atau fee tambahan yang lebih dari 1 QTY!</div><div style="padding:0 20px 20px 20px;"><button class="btn" onclick="tutupAlert()" style="background:var(--maroon); color:var(--gold);">OK, SAYA MENGERTI</button></div></div></div>
   <div id="m-confirm" class="modal"><div class="m-content"><h3>Konfirmasi</h3><p id="confirm-msg"></p><div style="display:flex; gap:10px;"><button class="btn" onclick="executeAddToCart()" style="background:#28a745; flex:1;">LANJUTKAN</button><button class="btn" onclick="closeConfirm()" style="background:#dc3545; flex:1;">BATAL</button></div></div></div>
   <div id="m-ket-manual" class="modal"><div class="m-content"><h3 style="margin-top:0; color:var(--maroon);">Keterangan Belanja</h3><input type="text" id="m-input-ket" placeholder="Contoh: Nasi Goreng Pak Jo" autocomplete="off"><button class="btn" onclick="submitKetManual()" style="background: #28a745;">TAMBAH KE KERANJANG</button><button class="btn" onclick="document.getElementById('m-ket-manual').style.display='none'" style="background:#666; margin-top:10px;">BATAL</button></div></div>
-  <div id="m-topup" class="modal"><div class="m-content"><h3>TOP UP</h3><input type="text" id="u-nom" placeholder="Nominal Rp" inputmode="numeric"><select id="u-met"><option value="BCA">BCA - 12345678 (Admin)</option><option value="DANA">DANA - 0812345678 (Admin)</option></select><button class="btn" onclick="saveTopUp()" style="background:#28a745; margin-top:10px;">KIRIM</button><button class="btn" onclick="document.getElementById('m-topup').style.display='none'" style="background:#666; margin-top:10px;">BATAL</button></div></div>
-
-  <div id="m-struk" class="modal" style="background: white;">
-    <div id="struk-area" style="width: 280px; margin: 0 auto; padding: 25px 10px; color: #000; background: white; font-family: 'Inter', sans-serif;">
-      <div style="text-align: center;"><div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:40px;letter-spacing:-2px;"><span style="color:var(--maroon);">KU</span><span style="color:var(--navy);">KAMI</span></div>
-      <span style="font-family:'Roboto',sans-serif;font-size:9px;letter-spacing:8px;text-indent: 8px;text-transform:lowercase;display:block;">delivery</span></div>
-      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="font-size:10px; margin-bottom:15px; line-height: 1.5;">
-
-  <div style="font-size:10px; margin-bottom:20px; line-height: 1.6; color: #444; font-family: 'Inter', sans-serif;">
-  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; margin-bottom: 4px;">
-    <span>Nama Rider</span>
-    <span id="s-rider" style="font-weight: bold; color: #000;">-</span> </div>
   
-  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; margin-bottom: 4px;">
-    <span>No. Nota</span>
-    <span id="s-inv" style="color: #000;">-</span> </div>
-  
-  <div style="display: flex; justify-content: space-between;">
-    <span>Waktu</span>
-    <span id="s-tgl" style="color: #000;">-</span> </div>
-</div>
+  <div id="m-topup" class="modal">
+    <div class="m-content">
+      <h3>TOP UP</h3>
+      <input type="text" id="u-nom" placeholder="Nominal Rp" inputmode="numeric">
+      
+      <select id="u-met" onchange="cekMetodeTopUp()">
+        <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
+        <option value="BCA Jimmy Irmansyah">BCA Jimmy Irmansyah</option>
+        <option value="DANA">DANA</option>
+        <option value="BSI">BSI</option>
+        <option value="OVO">OVO</option>
+        <option value="GOPAY">GOPAY</option>
+        <option value="LAIN LAIN">LAIN LAIN</option>
+      </select>
+      
+      <div id="container-ket-lainnya" style="display: none; margin-top: 10px; text-align: left; font-family: 'Inter', sans-serif;">
+        <label style="color: var(--maroon); font-weight: bold; font-size: 11px; display: block; margin-bottom: 5px;">DETAIL CASH / DEPO / TRANSFER (WAJIB):</label>
+        <textarea id="u-ket-lainnya" placeholder="Jelaskan di sini, misal: TOP UP CASH di CS Depo A, atau Depo dari CS transfer ke admin, dll..." style="width: 100%; height: 75px; border-radius: 12px; padding: 10px; border: 1px solid #ccc; font-size: 12px; resize: none; box-sizing: border-box; outline: none; font-family: inherit;"></textarea>
+      </div>
 
-<div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-<div style="text-align: center; font-size: 14px;">### LUNAS ###</div> <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+      <button class="btn" onclick="saveTopUp()" style="background:#28a745; margin-top:15px;">KIRIM</button>
+      <button class="btn" onclick="document.getElementById('m-topup').style.display='none'" style="background:#666; margin-top:10px;">BATAL</button>
+    </div>
+  </div>
 
-      <div id="s-items" style="font-size: 12px;"></div>
+  <div id="m-struk" class="modal" style="background: white; overflow-y: auto;">
+    <div id="struk-area" style="width: 300px; margin: 0 auto; padding: 40px 25px; color: #000; background: white; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+      <div style="text-align: center;">
+        <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:40px;letter-spacing:-2px;"><span style="color:var(--maroon);">KU</span><span style="color:var(--navy);">KAMI</span></div>
+        <span style="font-family:'Roboto',sans-serif;font-size:9px;letter-spacing:8px;text-indent: 8px;text-transform:lowercase;display:block;">delivery</span>
+        <div style="font-size: 8px; color: #333; margin-top: 10px; line-height: 1.4; font-weight: 600;">
+          Admin 1 : 081220774717<br>
+          Admin 2 : 089630042391
+        </div>
+      </div>
+      <div style="border-bottom: 1px dashed #000; margin: 12px 0;"></div>
+      <div style="font-size:10px; margin-bottom:15px; line-height: 1.2; color: #444; font-family: 'Inter', sans-serif;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; margin-bottom: 3px;">
+          <span>Nama Rider</span><span id="s-rider" style="font-weight: bold; color: #000;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; margin-bottom: 3px;">
+          <span>No. Nota</span><span id="s-inv" style="color: #000;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; margin-bottom: 3px;">
+          <span>Tipe Order</span><span id="s-tipe" style="font-weight: bold; color: #000; text-transform: uppercase;">-</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 2px;">
+          <span>Waktu</span><span id="s-tgl" style="color: #000;">-</span>
+        </div>
+      </div>
       <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; font-size: 15px;">TOTAL:</span><span id="s-total" style="background-color: #FFD700; color: #000; font-weight: 900; font-size: 16px; padding: 2px 10px; border-radius: 4px;">Rp 0</span></div>
+      <div style="text-align: center; font-size: 14px;">### LUNAS ###</div>
       <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
-      <div style="text-align: center; margin-top: 15px; font-size: 11px; font-family: sans-serif;">Jazakumullohu Khoiron Katsiron</div>
+      <div id="s-items" style="font-size: 10px;"></div>
+      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; font-size: 12px;">TOTAL:</span><span id="s-total" style="background-color: #FFD700; color: #000; font-weight: 900; font-size: 12px; padding: 2px 10px; border-radius: 4px;">Rp 0</span></div>
+      <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+      <div style="text-align: center; margin-top: 15px; font-size: 11px; font-family: sans-serif; font-style: italic;">Jazakumullohu Khoiron Katsiron</div>
+      <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+        <p style="margin: 0 0 5px 0; font-size: 10px; color: #666; font-weight: bold;">SCAN UNTUK RATING LAYANAN</p>
+        <div id="struk-qrcode" style="width: 150px; height: 150px; margin: 0 auto; background: #fff;"></div>
+      </div>
     </div>
-    </div>
-    <div style="padding: 10px 20px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="padding: 15px 20px; display: flex; flex-direction: column; gap: 10px; background: #E5E5E5;">
       <div style="display: flex; gap: 10px;"><button class="btn" style="background: #5d0000; flex: 1;" onclick="printStruk()">SIMPAN</button><button class="btn" style="background: #25D366; flex: 1;" onclick="shareStruk()">KIRIM STRUK</button></div>
+
+      <div id="area-tombol-cancel-kukami">
+        <button type="button" onclick="tampilkanFormCancel()" style="background:#CE1212; color:white; border:none; width:100%; padding:14px; border-radius:50px; font-weight:bold; font-size:14px; cursor:pointer; margin-top:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          ⚠️ AJUKAN PEMBATALAN STRUK
+        </button>
+      </div>
+
+      <div id="container-form-cancel" style="display:none; margin-top:5px; padding:15px; background:#f9f9f9; border:1px solid #ddd; border-radius:15px; text-align:left;">
+        <label style="font-size:12px; font-weight:bold; color:var(--maroon); display:block; margin-bottom:6px;">ALASAN PEMBATALAN (WAJIB):</label>
+        <textarea id="input-alasan-cancel" placeholder="Contoh: Salah input nominal tarif / Konsumen batalkan pesanan di tempat..." style="width:100%; height:75px; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:13px; resize:none; box-sizing:border-box; outline:none; font-family:inherit;"></textarea>
+        
+        <button type="button" onclick="kirimPengajuanCancel(document.getElementById('s-inv').innerText)" style="background:var(--maroon); color:white; border:none; width:100%; padding:10px; border-radius:10px; font-weight:bold; font-size:13px; cursor:pointer; margin-top:10px;">
+          KIRIM PERMOHONAN KE ADMIN
+        </button>
+      </div>
+
       <button class="btn" onclick="closeStruk()" style="background: #666; width: 100%;">TUTUP</button>
     </div>
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyzsZ5dgvyUbhUE729OdVSGLADBA--h6cn398yWUnL816zif5C1yKYT6rkBC8vfTptO/exec";
+    var warnedOnce = false;
+    var curRider = {}, masterTarif = [], cart = [], pendingItem = null, curNomStr = "0";
 
-    // Helper: panggil GAS API via fetch (dengan fallback JSONP)
-    async function gasCall(params) {
-      const url = new URL(GAS_URL);
-      Object.keys(params).forEach(k => {
-        const val = (k === "payload") ? encodeURIComponent(params[k]) : params[k];
-        url.searchParams.append(k, val);
-      });
-
-      // Coba fetch dulu
+    function getFingerprint() {
       try {
-        const res = await fetch(url.toString(), {
-          method: "GET",
-          mode: "cors",
-        });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return await res.json();
-      } catch(fetchErr) {
-        // Fallback: JSONP jika fetch gagal
-        return new Promise((resolve, reject) => {
-          const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
-          const script = document.createElement("script");
-          const timeout = setTimeout(() => {
-            delete window[cbName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-            reject(new Error("Timeout"));
-          }, 20000);
-          window[cbName] = function(data) {
-            clearTimeout(timeout);
-            delete window[cbName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-            resolve(data);
-          };
-          const u2 = new URL(GAS_URL);
-          u2.searchParams.append("callback", cbName);
-          Object.keys(params).forEach(k => {
-            const val = (k === "payload") ? encodeURIComponent(params[k]) : params[k];
-            u2.searchParams.append(k, val);
-          });
-          script.src = u2.toString();
-          script.onerror = () => {
-            clearTimeout(timeout);
-            delete window[cbName];
-            reject(new Error("Script error"));
-          };
-          document.head.appendChild(script);
-        });
-      }
-    }
-
-    let warnedOnce = false;
-    let curRider = {}, masterTarif = [], cart = [], pendingItem = null, curNomStr = "0";
-
-    // UTILS
-    const getFingerprint = () => localStorage.getItem('kukami_fp') || (() => { let id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase(); localStorage.setItem('kukami_fp', id); return id; })();
-    const formatRibuan = (v) => v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    const getAngka = (v) => Number(v.toString().replace(/\./g, ""));
-    const toast = (m) => { const c = document.getElementById('toast-container'); const d = document.createElement('div'); d.className = 'toast'; d.innerHTML = m; c.appendChild(d); setTimeout(() => d.remove(), 2500); };
-    const showLoading = (s) => document.getElementById('loader').style.display = s ? 'flex' : 'none';
-
-    // UI TABS
-    const setSubTab = (n) => { document.getElementById('f-manual').style.display = (n === 1) ? 'block' : 'none'; document.getElementById('f-tarif').style.display = (n === 2) ? 'block' : 'none'; document.getElementById('tb1').className = 'tab-btn ' + (n === 1 ? 'tab-active' : 'tab-inactive'); document.getElementById('tb2').className = 'tab-btn ' + (n === 2 ? 'tab-active' : 'tab-inactive'); };
-    const switchMainTab = (t) => { document.getElementById('p-home').style.display = t === 'home' ? 'block' : 'none'; document.getElementById('p-riwayat').style.display = t === 'riwayat' ? 'block' : 'none'; document.getElementById('n-home').className = 'nav-item ' + (t === 'home' ? 'active' : ''); document.getElementById('n-riwayat').className = 'nav-item ' + (t === 'riwayat' ? 'active' : ''); };
-
-    // AUTH — DIUBAH: google.script.run → fetch
-    async function prosesLogin() {
-      showLoading(true);
-      try {
-        const res = await gasCall({
-          action: "login",
-          u: document.getElementById('user').value,
-          p: document.getElementById('pin').value,
-          d: getFingerprint(),
-          t: navigator.userAgent
-        });
-        showLoading(false);
-        if (res.status === "success") {
-          curRider = res.rider;
-          localStorage.setItem('kukami_session', JSON.stringify(curRider));
-          initDashboard();
-        } else {
-          alert("Akses Ditolak!");
+        var id = localStorage.getItem('kukami_fp');
+        if (!id) {
+          id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+          localStorage.setItem('kukami_fp', id);
         }
-      } catch(err) {
-        showLoading(false);
-        alert("Gagal terhubung ke server!");
-      }
+        return id;
+      } catch(e) { return "ID-UNKNOWN-" + Math.floor(Math.random() * 10000); }
     }
 
-    // DASHBOARD DATA — DIUBAH: google.script.run → fetch
-    async function initDashboard() {
+    function formatRibuan(v) {
+      return v.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function getAngka(v) {
+      return Number(v.toString().replace(/\./g, ""));
+    }
+
+    function toast(m) {
+      var c = document.getElementById('toast-container');
+      if (!c) return;
+      var d = document.createElement('div');
+      d.className = 'toast';
+      d.innerHTML = m;
+      c.appendChild(d);
+      setTimeout(function() { d.remove(); }, 2500);
+    }
+
+    function showLoading(s) {
+      var loader = document.getElementById('loader');
+      if(loader) loader.style.display = s ? 'flex' : 'none';
+    }
+
+    function setSubTab(n) {
+      document.getElementById('f-manual').style.display = (n === 1) ? 'block' : 'none';
+      document.getElementById('f-tarif').style.display = (n === 2) ? 'block' : 'none';
+      document.getElementById('tb1').className = 'tab-btn ' + (n === 1 ? 'tab-active' : 'tab-inactive');
+      document.getElementById('tb2').className = 'tab-btn ' + (n === 2 ? 'tab-active' : 'tab-inactive');
+    }
+
+    function switchMainTab(t) {
+      document.getElementById('p-home').style.display = (t === 'home') ? 'block' : 'none';
+      document.getElementById('p-riwayat').style.display = (t === 'riwayat') ? 'block' : 'none';
+      document.getElementById('n-home').className = 'nav-item ' + (t === 'home' ? 'active' : '');
+      document.getElementById('n-riwayat').className = 'nav-item ' + (t === 'riwayat' ? 'active' : '');
+    }
+
+    function prosesLogin() {
+      var debug = document.getElementById('debug-layar');
+      if(debug) debug.innerText = "⏳ MENGHUBUNGKAN CLOUD SERVER...";
+      showLoading(true);
+      
+      if (typeof google === 'undefined') {
+        showLoading(false);
+        if(debug) debug.innerText = "🚨 ENGINE ERROR: Gunakan link /dev di Tab Baru!";
+        toast("🚨 Akses Terblokir! Gunakan Link /dev di Tab Baru."); 
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          showLoading(false);
+          if (res && res.status === "success") {
+            if(debug) debug.innerText = "✅ AKSES DITERIMA!";
+            curRider = res.rider;
+            try { localStorage.setItem('kukami_session', JSON.stringify(curRider)); } catch(e) {}
+            initDashboard();
+          } else if (res && res.status === "device_locked") {
+            if(debug) debug.innerText = "❌ AKSES DITOLAK: DEVICE TERKUNCI";
+            toast("🔒 <b>Akses Ditolak!</b> Akun terkunci di perangkat lain. Hubungi Admin."); 
+          } else {
+            if(debug) debug.innerText = "❌ PIN ATAU AKUN SALAH";
+            toast("❌ <b>Akses Ditolak!</b> Akun tidak terdaftar atau PIN salah."); 
+          }
+        })
+        .withFailureHandler(function(err) {
+          showLoading(false);
+          if(debug) debug.innerText = "⚠️ GOOGLE CLOUD DOWN: " + err.toString();
+          toast("⚠️ <b>Gagal Terhubung:</b> Periksa jaringan internet Anda."); 
+        })
+        .loginRider(document.getElementById('user').value, document.getElementById('pin').value, getFingerprint(), navigator.userAgent);
+    }
+
+    function initDashboard() {
       document.getElementById('p-login').style.display = 'none';
       document.getElementById('app-content').style.display = 'block';
       showLoading(true);
-
-      try {
-        const res = await gasCall({ action: "dashboard", id: curRider.id });
+      
+      google.script.run.withSuccessHandler(function(res) {
         showLoading(false);
         if (!res) return;
 
-        // 1. Logic Icon Performa
-        const perfMap = {
-          "TOP PERFORM": { icon: "💎", class: "anim-diamond" },
-          "TOP PERFORMER": { icon: "💎", class: "anim-diamond" },
-          "PERFORM": { icon: "🛡️", class: "" },
-          "PERFORMER": { icon: "🛡️", class: "" },
-          "UNDERPERFORM": { icon: "🚨", class: "anim-red" },
-          "UNDERPERFORMER": { icon: "🚨", class: "anim-red" }
+        var perfMap = {
+          "TOP PERFORM": { icon: "💎", className: "anim-diamond" },
+          "TOP PERFORMER": { icon: "💎", className: "anim-diamond" },
+          "PERFORM": { icon: "🛡️", className: "" },
+          "PERFORMER": { icon: "🛡️", className: "" },
+          "UNDERPERFORM": { icon: "🚨", className: "anim-red" },
+          "UNDERPERFORMER": { icon: "🚨", className: "anim-red" }
         };
 
-        const statusRider = res.kelas ? res.kelas.toUpperCase().trim() : "";
-        const dataPerf = perfMap[statusRider] || { icon: "👤", class: "" };
-        const badgeHtml = `<span class="perf-icon ${dataPerf.class}">${dataPerf.icon}</span>`;
-        document.getElementById('r-nama').innerHTML = `${curRider.nama} ${badgeHtml}`;
-
-        // 3. TAMPILKAN SALDO & FOTO
+        var statusRider = res.kelas ? res.kelas.toUpperCase().trim() : "";
+        var dataPerf = perfMap[statusRider] || { icon: "👤", className: "" };
+        var badgeHtml = '<span class="perf-icon ' + dataPerf.className + '">' + dataPerf.icon + '</span>';
+        
+        document.getElementById('r-nama').innerHTML = curRider.nama + ' ' + badgeHtml;
         document.getElementById('r-saldo').innerText = "Rp " + Number(res.saldo || 0).toLocaleString();
         if (res.foto) document.getElementById('r-foto').src = res.foto;
+        
+        // 🌟 SUNTIKAN UI TAHAP 5 (LOCKED UI: MAROON & GOLD)
+        // Pastikan backend getDashboardData mengirimkan rank_tot, rank_on, dan rank_off
+        
+        // -- DATA HARI INI --
+        document.getElementById('h-trip').innerText = res.stats.hari.total || 0;
+        document.getElementById('h-rank').innerText = res.stats.hari.rank_tot || "-"; 
+        document.getElementById('h-on').innerText = res.stats.hari.on || 0;
+        document.getElementById('h-rank-on').innerText = res.stats.hari.rank_on || "-";
+        document.getElementById('h-off').innerText = res.stats.hari.off || 0;
+        document.getElementById('h-rank-off').innerText = res.stats.hari.rank_off || "-";
+        
+        // -- DATA BULAN INI --
+        document.getElementById('b-trip').innerText = res.stats.bulan.total || 0;
+        document.getElementById('b-rank').innerText = res.stats.bulan.rank_tot || "-";
+        document.getElementById('b-on').innerText = res.stats.bulan.on || 0;
+        document.getElementById('b-rank-on').innerText = res.stats.bulan.rank_on || "-";
+        document.getElementById('b-off').innerText = res.stats.bulan.off || 0;
+        document.getElementById('b-rank-off').innerText = res.stats.bulan.rank_off || "-";
 
-        // 4. UPDATE STATS
-        document.getElementById('h-total').innerText = res.stats.hari.total;
-        document.getElementById('h-on').innerText = res.stats.hari.on;
-        document.getElementById('h-off').innerText = res.stats.hari.off;
-        document.getElementById('b-total').innerText = res.stats.bulan.total;
-        document.getElementById('b-on').innerText = res.stats.bulan.on;
-        document.getElementById('b-off').innerText = res.stats.bulan.off;
-
-        // 5. UPDATE RANKING STABILO
-        if (typeof updateRank === 'function') {
-          updateRank('rk-h-on', res.stats.hari.rank_on, 'hari');
-          updateRank('rk-h-off', res.stats.hari.rank_off, 'hari');
-          updateRank('rk-on', res.stats.bulan.rank_on, 'bulan');
-          updateRank('rk-off', res.stats.bulan.rank_off, 'bulan');
-        }
-
-        // 6. RENDER RIWAYAT & TARIF
         masterTarif = res.listTarif || [];
-        if (typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
+        if (res.rekening) { curRider.rekening = res.rekening; }
 
-        const cats = [...new Set(masterTarif.map(x => x.kategori))];
-        if (cats.length > 0) {
-          document.getElementById('cat-list').innerHTML = cats.map(cat =>
-            `<div class="chip" onclick="renderGrid('${cat}')">${cat}</div>`).join('');
-          if (typeof renderGrid === 'function') renderGrid(cats[0]);
+        if (typeof renderRiwayat === 'function') renderRiwayat(res.riwayat);
+        
+        var seen = {};
+        var cats = [];
+        for (var i = 0; i < masterTarif.length; i++) {
+          var cName = masterTarif[i].kategori;
+          if (!seen[cName]) { seen[cName] = true; cats.push(cName); }
         }
 
-      } catch(err) {
-        showLoading(false);
-        toast("⚠️ Gagal memuat data!");
-      }
+        if (cats.length > 0) {
+          document.getElementById('cat-list').innerHTML = cats.map(function(cat) {
+            return '<div class="chip" onclick="renderGrid(\'' + cat + '\')">' + cat + '</div>';
+          }).join('');
+          renderGrid(cats[0]);
+        }
+      }).getDashboardData(curRider.id);
     }
 
-    // NUMPAD
-    function pressNum(v) { if (v === 'C') curNomStr = "0"; else if (v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0"; else { if (curNomStr === "0") curNomStr = v; else curNomStr += v; } document.getElementById('m-nom').value = "Rp " + formatRibuan(curNomStr); }
+    function pressNum(v) {
+      if (v === 'C') curNomStr = "0";
+      else if (v === '⌫') curNomStr = curNomStr.length > 1 ? curNomStr.slice(0, -1) : "0";
+      else { if (curNomStr === "0") curNomStr = v; else curNomStr += v; }
+      document.getElementById('m-nom').value = "Rp " + formatRibuan(curNomStr);
+    }
 
-    // TARIF GRID
     function renderGrid(cat) {
-      const f = masterTarif.filter(x => x.kategori === cat);
-      document.getElementById('grid-list').innerHTML = f.map(i => `
-        <div class="service-card" onclick="hitService('${i.layanan}', ${i.nominal}, ${i.potongan})">
-          <b>${i.layanan}</b><span>Rp ${Number(i.nominal).toLocaleString()}</span>
-        </div>`).join('');
+      var f = masterTarif.filter(function(x) { return x.kategori === cat; });
+      document.getElementById('grid-list').innerHTML = f.map(function(i) {
+        return '<div class="service-card" onclick="hitService(\'' + i.layanan + '\', ' + i.nominal + ', ' + i.potongan + ')"><b>' + i.layanan + '</b><span>Rp ' + Number(i.nominal).toLocaleString() + '</span></div>';
+      }).join('');
     }
 
-    // Hit Service dengan Logika Bypass HP ADMIN
-    function hitService(ket, nom) {
-      const ketUpper = ket.toUpperCase();
-      const itemData = masterTarif.find(t => t.layanan.toUpperCase() === ketUpper);
-      const pot = itemData ? itemData.potongan : 0;
-
-      let nominalFix = (ketUpper.includes("HP ADMIN")) ? 10000 : nom;
-      let potonganFix = (ketUpper.includes("HP ADMIN")) ? 0.2 : pot;
-
-      pendingItem = {
-        ket: ketUpper,
-        nominal: nominalFix,
-        qty: 1,
-        potongan: potonganFix
-      };
-
-      if (ketUpper.includes("HP ADMIN")) {
-        finalProcess('Online', [pendingItem]);
-      } else {
-        executeAddToCart();
-      }
+    function hitService(ket, nom, pot) {
+      var ketUpper = ket.toUpperCase();
+      var nominalFix = ketUpper.indexOf("HP ADMIN") !== -1 ? 10000 : nom;
+      var potonganFix = ketUpper.indexOf("HP ADMIN") !== -1 ? 0.2 : (pot || 0);
+      
+      pendingItem = { ket: ketUpper, nominal: nominalFix, qty: 1, potongan: potonganFix };
+      if (ketUpper.indexOf("HP ADMIN") !== -1) { finalProcess('HP ADMIN', [pendingItem]); } else { executeAddToCart(); }
     }
 
-    function openKetManual() { if(getAngka(curNomStr) <= 0) return toast("⚠️ Isi Nominal!"); document.getElementById('m-ket-manual').style.display = 'block'; }
+    function openKetManual() {
+      if (getAngka(curNomStr) <= 0) return toast("⚠️ Isi Nominal!");
+      document.getElementById('m-ket-manual').style.display = 'block';
+    }
 
     function submitKetManual() {
-      const inputKet = document.getElementById('m-input-ket');
-      const ketRaw = inputKet.value.trim();
-      const ket = ketRaw.toLowerCase();
+      var inputKet = document.getElementById('m-input-ket');
+      var ketRaw = inputKet.value.trim();
+      var ket = ketRaw.toLowerCase();
       if (!ketRaw) return toast("⚠️ Isi keterangan belanja!");
       document.getElementById('m-ket-manual').style.display = 'none';
 
       if (ket === "hp admin") {
         pendingItem = { ket: "HP ADMIN", nominal: 10000, qty: 1, potongan: 0.2 };
-        executeAddToCart();
+        finalProcess('HP ADMIN', [pendingItem]);
       } else {
-        const isRev = ["ongkir", "ongkos", "tarif", "tarip", "fee", "jasa"].some(k => ket.includes(k));
+        var keywords = ["ongkir", "ongkos", "tarif", "tarip", "fee", "jasa"];
+        var isRev = false;
+        for (var i = 0; i < keywords.length; i++) {
+          if (ket.indexOf(keywords[i]) !== -1) { isRev = true; break; }
+        }
         pendingItem = { ket: ketRaw.toUpperCase(), nominal: getAngka(curNomStr), qty: 1, potongan: isRev ? 0.2 : 0 };
         if (isRev) {
           document.getElementById('confirm-msg').innerHTML = "Layanan '" + ketRaw + "' memotong komisi 20%.";
@@ -460,213 +441,399 @@
 
     function executeAddToCart() {
       document.getElementById('m-confirm').style.display = 'none';
-      const idx = cart.findIndex(c => c.ket === pendingItem.ket);
-      if(idx > -1) cart[idx].qty++; else cart.push(pendingItem);
+      var idx = -1;
+      for (var i = 0; i < cart.length; i++) { if (cart[i].ket === pendingItem.ket) { idx = i; break; } }
+      if (idx > -1) cart[idx].qty++; else cart.push(pendingItem);
+      
+      try { localStorage.setItem('kukami_cart', JSON.stringify(cart)); } catch(e) {}
       renderCart(); toast("✅ Ditambah"); curNomStr = "0"; document.getElementById('m-nom').value = "Rp 0";
     }
 
     function renderCart() {
       document.getElementById('cart-float').style.display = cart.length ? 'block' : 'none';
-      let tot = cart.reduce((a,c)=>a+(c.nominal*c.qty), 0);
+      var tot = 0;
+      for (var i = 0; i < cart.length; i++) { tot += (cart[i].nominal * cart[i].qty); }
       document.getElementById('c-qty').innerText = cart.length;
       document.getElementById('c-total').innerText = "Rp " + tot.toLocaleString();
-      document.getElementById('c-list').innerHTML = cart.map((i, idx)=>`<div class="cart-row"><div style="flex:1;"><b>${i.ket}</b><br><small>Rp ${i.nominal.toLocaleString()}</small></div><div style="display:flex; align-items:center; gap:8px;"><button class="qty-btn" onclick="updateQty(${idx}, -1)">-</button><span style="font-weight:bold; min-width:20px; text-align:center;">${i.qty}</span><button class="qty-btn" onclick="updateQty(${idx}, 1)">+</button><button onclick="removeItem(${idx})" style="border:none;background:none;color:red;font-size:18px;">🗑</button></div></div>`).join('');
+      
+      document.getElementById('c-list').innerHTML = cart.map(function(i, idx) {
+        return '<div class="cart-row"><div style="flex:1;"><b>' + i.ket + '</b><br><small>Rp ' + i.nominal.toLocaleString() + '</small></div><div style="display:flex; align-items:center; gap:8px;"><button class="qty-btn" onclick="updateQty(' + idx + ', -1)">-</button><span style="font-weight:bold; min-width:20px; text-align:center;">' + i.qty + '</span><button class="qty-btn" onclick="updateQty(' + idx + ', 1)">+</button><button onclick="removeItem(' + idx + ')" style="border:none;background:none;color:red;font-size:18px;">🗑</button></div></div>';
+      }).join('');
     }
 
-    function updateQty(idx, d) { cart[idx].qty += d; if (cart[idx].qty <= 0) removeItem(idx); else renderCart(); }
-    function removeItem(idx) { cart.splice(idx, 1); renderCart(); if(!cart.length) document.getElementById('m-cart').style.display = 'none'; }
-    function showCart() {
-      document.getElementById('m-cart').style.display = 'block';
-      renderCart();
-      setTimeout(cekValidasiQty, 300);
+    function updateQty(idx, d) { 
+      cart[idx].qty += d; 
+      if (cart[idx].qty <= 0) { cart.splice(idx, 1); } 
+      try { localStorage.setItem('kukami_cart', JSON.stringify(cart)); } catch(e) {}
+      renderCart(); 
     }
+    
+    function removeItem(idx) { 
+      cart.splice(idx, 1); 
+      try { localStorage.setItem('kukami_cart', JSON.stringify(cart)); } catch(e) {}
+      renderCart(); 
+      if (!cart.length) document.getElementById('m-cart').style.display = 'none'; 
+    }
+    
+    function showCart() { document.getElementById('m-cart').style.display = 'block'; renderCart(); setTimeout(cekValidasiQty, 300); }
     function tutupKeranjang() { document.getElementById('m-cart').style.display = 'none'; }
     function closeConfirm() { document.getElementById('m-confirm').style.display = 'none'; pendingItem = null; }
 
-    // Final Process — DIUBAH: google.script.run → fetch
-    async function finalProcess(tipe, overrideItems) {
-      const itemsToSubmit = overrideItems || cart;
+    function finalProcess(tipe, overrideItems) {
+      var itemsToSubmit = overrideItems || cart;
       if (itemsToSubmit.length === 0) return toast("⚠️ Keranjang kosong!");
-
       document.getElementById('m-cart').style.display = 'none';
       showLoading(true);
-
-      try {
-        const res = await gasCall({
-          action: "transaksi",
-          payload: JSON.stringify({
-            idRider: curRider.id,
-            namaRider: curRider.nama,
-            items: itemsToSubmit,
-            tipe: tipe,
-            deviceInfo: navigator.userAgent
-          })
-        });
-
+      
+      google.script.run.withSuccessHandler(function(res) {
         showLoading(false);
         toast("✅ Berhasil!");
-        const itemsCopy = JSON.parse(JSON.stringify(itemsToSubmit));
-
-        if (!overrideItems) { cart = []; renderCart(); }
-
+        var itemsCopy = JSON.parse(JSON.stringify(itemsToSubmit));
+        if (!overrideItems) { 
+          cart = []; 
+          try { localStorage.removeItem('kukami_cart'); } catch(e) {}
+          renderCart(); 
+        }
         initDashboard();
-        showStruk(res, itemsCopy);
+        
+        if (!res) res = {};
+        res.tipe = tipe; 
+        showStruk(res, itemsCopy, false, "OK");
+      }).simpanTransaksi({ idRider: curRider.id, namaRider: curRider.nama, items: itemsToSubmit, tipe: tipe, deviceInfo: navigator.userAgent });
+    }
+
+    function renderRiwayat(data) {
+      var h = '', lastD = '';
+      if (!data || !data.length) return document.getElementById('list-riwayat').innerHTML = '<div style="padding:30px; text-align:center; color:#888;">Belum ada riwayat</div>';
+      
+      data.forEach(function(i, idx) {
+        if (i.tglDisplay !== lastD) { h += '<div class="date-separator"><span>' + i.tglDisplay + '</span><div class="date-line"></div></div>'; lastD = i.tglDisplay; }
+        var tClass = i.tipe.toLowerCase();
+        if (i.ket.toUpperCase().indexOf("HP ADMIN") !== -1) tClass = "hp";
+        if (i.tipe.toUpperCase() === "TOPUP") tClass = "topup";
+        
+        var htmlTagStatus = '<span class="hl-tag hl-' + tClass + '">' + i.tipe + '</span>';
+        var gayaNominalTeks = 'color: var(--maroon); font-weight: bold; font-size: 12px;';
+        var statusMurni = i.status ? i.status.toUpperCase() : "OK";
+
+        if (i.tipe.toUpperCase() !== "TOPUP") {
+          if (statusMurni.indexOf("PENDING CANCEL") !== -1) {
+            htmlTagStatus += '<span class="hl-tag" style="background:#FFA500; color:white;">⏳ MENUNGGU APPROVAL CANCEL</span>';
+          } else if (statusMurni === "CANCELED") {
+            htmlTagStatus += '<span class="hl-tag" style="background:#CE1212; color:white;">❌ CANCELED</span>';
+            gayaNominalTeks += ' text-decoration: line-through; color: #cc0000; opacity: 0.5;';
+          }
+        } else {
+          if (statusMurni === "PENDING") {
+            htmlTagStatus = '<span class="hl-tag hl-topup" style="background:#FFA500;">⏳ MENUNGGU APPROVAL TOP UP</span>';
+          } else if (statusMurni === "APPROVED") {
+            htmlTagStatus = '<span class="hl-tag hl-topup" style="background:#28a745;">✅ TOP UP APPROVED</span>';
+          }
+        }
+        
+        h += '<div class="item-r" onclick="cetakUlangStruk(' + idx + ', true)" style="cursor: pointer; active { opacity: 0.7 };"><div style="flex: 1; padding-right: 10px; font-size: 10px;"><div style="color: #888; margin-bottom: 3px;">' + i.jam + ' | <span style="font-weight: bold; color: #333;">' + i.id + '</span></div><div style="color: #333; margin-bottom: 5px; line-height: 1.3;">' + i.ket + '</div><div>' + htmlTagStatus + '</div></div><div style="text-align: right; min-width: 85px; padding-top: 2px;"><span style="' + gayaNominalTeks + '">Rp ' + Number(i.nom).toLocaleString() + '</span></div></div>';
+      });
+      document.getElementById('list-riwayat').innerHTML = h;
+      window.globalRiwayatData = data;
+    }
+
+    // 🌟 FRONTEND OPSI 1: Membaca Harga Asli Tanpa Rumus Pembagian Matematika
+    function cetakUlangStruk(idx, berasalDariRiwayat) {
+      try {
+        var dataSelected = window.globalRiwayatData ? window.globalRiwayatData[idx] : null;
+        if (!dataSelected) return toast("⚠️ Gagal memuat data riwayat.");
+        if (dataSelected.tipe.toUpperCase() === "TOPUP") {
+          return toast("ℹ️ Transaksi Top Up tidak memiliki struk belanja.");
+        }
+        
+        showLoading(true);
+        var rawItems = dataSelected.ket ? dataSelected.ket.split(",") : [];
+        var itemsForStruk = [];
+        
+        rawItems.forEach(function(txt) {
+          var cleanTxt = txt.trim();
+          if (cleanTxt === "") return;
+          
+          var qty = 1; 
+          var namaBarang = cleanTxt;
+          var hargaAsli = 0;
+          
+          // DETEKSI HARGA ASLI: Cek apakah ada pemisah "|" dari database baru
+          if (cleanTxt.indexOf("|") !== -1) {
+            var splitHarga = cleanTxt.split("|");
+            cleanTxt = splitHarga[0].trim(); // Ambil teks barangnya saja
+            hargaAsli = Number(splitHarga[1]) || 0; // Ambil harga aslinya
+          }
+          
+          if (cleanTxt.indexOf("x ") !== -1) { 
+            var parts = cleanTxt.split("x "); 
+            qty = Number(parts[0]) || 1; 
+            namaBarang = parts[1] || cleanTxt; 
+          } else if (cleanTxt.indexOf("x") !== -1) { 
+            var parts = cleanTxt.split("x"); 
+            qty = Number(parts[0]) || 1; 
+            namaBarang = parts[1] || cleanTxt; 
+          }
+          
+          itemsForStruk.push({ 
+            ket: namaBarang.toUpperCase(), 
+            qty: qty,
+            nominal: hargaAsli // Langsung masukkan harga murni dari database
+          });
+        });
+
+        var resTiruan = {
+          nota: dataSelected.id,
+          total: Number(dataSelected.nom), 
+          waktu: dataSelected.jam,
+          tipe: dataSelected.tipe 
+        };
+        
+        showLoading(false);
+        showStruk(resTiruan, itemsForStruk, berasalDariRiwayat, dataSelected.status);
       } catch(err) {
         showLoading(false);
-        toast("⚠️ Gagal menyimpan transaksi!");
+        toast("⚠️ Gagal memuat struk.");
       }
     }
 
-    // STRUK
-    function showStruk(res, items) {
+    // 🌟 TAMPILAN STRUK: Rincian Nominal Dijamin Akurat 100% dan Tidak Sama Rata!
+    function showStruk(res, items, berasalDariRiwayat, statusTransaksi) {
       document.getElementById('s-inv').innerText = res.nota;
       document.getElementById('s-rider').innerText = curRider.nama;
-
-      let raw = res.waktu || "";
-      let clean = raw.replace(/WIB/g, "").trim();
-      let finalWaktu = "";
-
-      if (clean.includes("/") || clean.includes("-")) {
-        finalWaktu = clean.replace(" ", " | ") + " WIB";
-      } else {
-        let d = new Date();
-        let opsi = { day: 'numeric', month: 'long', year: 'numeric' };
-        let tglSekarang = d.toLocaleDateString('id-ID', opsi);
-        finalWaktu = tglSekarang + " | " + clean + " WIB";
+      document.getElementById('s-tipe').innerText = res.tipe ? res.tipe.toUpperCase() : "-";
+      
+      var webAppUrl = "<?= webAppUrl ?>"; 
+      var linkRatingText = webAppUrl + "?page=rating&inv=" + encodeURIComponent(res.nota) + "&rider=" + encodeURIComponent(curRider.id);
+      
+      var qrContainer = document.getElementById('struk-qrcode');
+      if (qrContainer) {
+        qrContainer.innerHTML = ""; 
+        new QRCode(qrContainer, { text: linkRatingText, width: 150, height: 150, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
       }
-
+  
+      var raw = res.waktu || "";
+      var clean = raw.replace(/WIB/g, "").trim();
+      var finalWaktu = "";
+      if (clean.indexOf("/") !== -1 || clean.indexOf("-") !== -1) { finalWaktu = clean.replace(" ", " | ") + " WIB"; } 
+      else { var d = new Date(); var opsi = { day: 'numeric', month: 'long', year: 'numeric' }; finalWaktu = d.toLocaleDateString('id-ID', opsi) + " | " + clean + " WIB"; }
       document.getElementById('s-tgl').innerText = finalWaktu;
-
-      let h = '';
-      items.forEach(i => {
-        h += `<div style="margin-bottom:10px; font-family: 'Inter', sans-serif;">
-                <div style="display:flex; justify-content:space-between; font-weight:bold; color:#000;">
-                  <span>${i.ket}</span>
-                  <span>Rp ${(i.nominal*i.qty).toLocaleString()}</span> </div>
-                <div style="font-size:10px; color:#666;">${i.qty} x Rp ${i.nominal.toLocaleString()}</div> </div>`;
-      });
-
+      
+      var h = '';
+      if (!items || items.length === 0) {
+        h += '<div style="margin-bottom:10px; font-family: \'Inter\', sans-serif;"><div style="display:flex; justify-content:space-between; font-weight:bold; color:#000;"><span>' + res.tipe.toUpperCase() + '</span><span>Rp ' + res.total.toLocaleString() + '</span></div></div>';
+      } else {
+        items.forEach(function(i) {
+          // JIKA TRANSAKSI BARU (Sudah Ada Harga Asli dari Tanda |)
+          if (i.nominal > 0) {
+            var subTotalItem = i.nominal * i.qty;
+            h += '<div style="margin-bottom:12px; font-family: \'Inter\', sans-serif;">' +
+                   '<div style="display:flex; justify-content:space-between; font-weight:bold; color:#000; margin-bottom:2px;">' +
+                     '<span>' + i.ket + '</span>' +
+                     '<span>Rp ' + subTotalItem.toLocaleString() + '</span>' +
+                   '</div>' +
+                   '<div style="font-size:10px; color:#666;">' + i.qty + ' x Rp ' + i.nominal.toLocaleString() + '</div>' +
+                 '</div>';
+          } 
+          // JIKA TRANSAKSI LAMA (Belum pakai | agar tidak error angka ngaco)
+          else {
+            if (items.length === 1) {
+              h += '<div style="margin-bottom:12px; font-family: \'Inter\', sans-serif;"><div style="display:flex; justify-content:space-between; font-weight:bold; color:#000; margin-bottom:2px;"><span>' + i.ket + '</span><span>Rp ' + res.total.toLocaleString() + '</span></div><div style="font-size:10px; color:#666;">' + i.qty + ' x Rp ' + res.total.toLocaleString() + '</div></div>';
+            } else {
+              h += '<div style="margin-bottom:10px; font-family: \'Inter\', sans-serif; font-weight:bold; color:#000; border-bottom: 1px solid #f9f9f9; padding-bottom:4px;"><span>' + i.qty + 'x ' + i.ket + '</span></div>';
+            }
+          }
+        });
+      }
+      
       document.getElementById('s-items').innerHTML = h;
       document.getElementById('s-total').innerText = "Rp " + res.total.toLocaleString();
+
+      var areaTombolBatal = document.getElementById('area-tombol-cancel-kukami');
+      var formCancelKukami = document.getElementById('container-form-cancel');
+      var inputAlasanKukami = document.getElementById('input-alasan-cancel');
+      
+      if (formCancelKukami) { formCancelKukami.style.display = 'none'; }
+      if (inputAlasanKukami) { inputAlasanKukami.value = ''; }
+
+      if (areaTombolBatal) {
+        var statUpper = statusTransaksi ? statusTransaksi.toUpperCase() : "OK";
+        if (!berasalDariRiwayat) {
+          areaTombolBatal.style.display = 'none';
+        } else {
+          areaTombolBatal.style.display = 'block';
+          if (statUpper.indexOf("PENDING CANCEL") !== -1) {
+            areaTombolBatal.innerHTML = '<div style="background:#FFA500; color:white; text-align:center; padding:12px; border-radius:12px; font-weight:bold; font-size:12px; margin-top:10px;">⏳ MENUNGGU APPROVAL CANCEL ADMIN</div>';
+          } else if (statUpper === "CANCELED") {
+            areaTombolBatal.innerHTML = '<div style="background:#666; color:white; text-align:center; padding:12px; border-radius:12px; font-weight:bold; font-size:12px; margin-top:10px;">❌ STRUK INI SUDAH DIBATALKAN</div>';
+          } else {
+            areaTombolBatal.innerHTML = '<button type="button" onclick="tampilkanFormCancel()" style="background:#CE1212; color:white; border:none; width:100%; padding:14px; border-radius:50px; font-weight:bold; font-size:14px; cursor:pointer; margin-top:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">⚠️ AJUKAN PEMBATALAN STRUK</button>';
+          }
+        }
+      }
       document.getElementById('m-struk').style.display = 'block';
     }
 
-    function printStruk() { html2canvas(document.getElementById("struk-area")).then(canvas => { const link = document.createElement('a'); link.download = 'STRUK_KUKAMI.png'; link.href = canvas.toDataURL(); link.click(); }); }
+    function printStruk() {
+      showLoading(true);
+      html2canvas(document.getElementById("struk-area"), { scale: 2, useCORS: true }).then(function(canvas) {
+        showLoading(false);
+        var link = document.createElement('a');
+        link.download = 'STRUK_KUKAMI.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(function() { showLoading(false); toast("⚠️ Gagal memproses gambar."); });
+    }
+    
+    function shareStruk() {
+      var area = document.getElementById('struk-area');
+      showLoading(true);
+      html2canvas(area, { scale: 2, useCORS: true }).then(function(canvas) {
+        canvas.toBlob(function(blob) {
+          if (!blob) { showLoading(false); toast("⚠️ Gagal."); return; }
+          var file = new File([blob], 'Struk_KUKAMI.png', { type: 'image/png' });
+          var invActive = document.getElementById('s-inv').innerText;
+          var webAppUrl = "<?= webAppUrl ?>";
+          var riderIdClean = curRider.id.toString().trim();
+          var longUrl = webAppUrl + "?page=rating&inv=" + encodeURIComponent(invActive) + "&rider=" + encodeURIComponent(riderIdClean);
 
-    async function shareStruk() {
-      const area = document.getElementById('struk-area'); showLoading(true);
-      try {
-        const canvas = await html2canvas(area, { scale: 2 });
-        canvas.toBlob(async (blob) => {
-          const file = new File([blob], 'Struk_KUKAMI.png', { type: 'image/png' });
-          if (navigator.share) { await navigator.share({ files: [file], text: 'Amanah akan segera disampaikan...mohon ditunggu ya ka...', title: 'Struk KUKAMI' }); }
-          else { toast("⚠️ Browser tidak dukung share."); }
-          showLoading(false);
+          var textCaption = "Amanah akan segera disampaikan. Mohon ditunggu ya...\n\n";
+          var nomorRekening = "";
+          if (curRider && curRider.rekening) { nomorRekening = curRider.rekening.toString().trim(); }
+          if (nomorRekening !== "") { textCaption += "Jika ingin transfer bisa ke:\n" + nomorRekening + "\n\n"; }
+          textCaption += "Mohon luangkan waktu 5 detik untuk memberikan penilaian pelayanan Rider kami melalui link resmi KUKAMI di bawah ini:\n👉 " + longUrl;
+
+          if (navigator.share) {
+            navigator.share({ files: [file], text: textCaption, title: 'Struk KUKAMI' })
+              .then(function() { showLoading(false); })
+              .catch(function() { showLoading(false); });
+          } else { showLoading(false); toast("⚠️ Browser tidak share."); }
         });
-      } catch (err) { showLoading(false); toast("⚠️ Gagal."); }
+      }).catch(function() { showLoading(false); toast("⚠️ Gagal gambar."); });
     }
 
-    function closeStruk() { document.getElementById('m-struk').style.display = 'none'; initDashboard(); }
-
-    // RIWAYAT
-    function renderRiwayat(data) {
-      let h = '', lastD = '';
-      if (!data || !data.length) return document.getElementById('list-riwayat').innerHTML = '<div style="padding:30px; text-align:center; color:#888;">Belum ada riwayat</div>';
-      data.forEach(i => {
-        if(i.tglDisplay !== lastD) { h += `<div class="date-separator"><span>${i.tglDisplay}</span><div class="date-line"></div></div>`; lastD = i.tglDisplay; }
-        let tClass = i.tipe.toLowerCase();
-        if (i.ket.toUpperCase().includes("HP ADMIN")) tClass = "hp";
-        if (i.tipe.toUpperCase() === "TOPUP") tClass = "topup";
-        h += `<div class="item-r"><div style="flex: 1; padding-right: 10px; font-size: 10px;"><div style="color: #888; margin-bottom: 3px;">${i.jam} | <span style="font-weight: bold; color: #333;">${i.id}</span></div><div style="color: #333; margin-bottom: 5px; line-height: 1.3;">${i.ket}</div><div><span class="hl-tag hl-${tClass}">${i.tipe}</span></div></div><div style="text-align: right; min-width: 85px; padding-top: 2px;"><span style="color: var(--maroon); font-weight: bold; font-size: 12px;">Rp ${Number(i.nom).toLocaleString()}</span></div></div>`;
-      });
-      document.getElementById('list-riwayat').innerHTML = h;
+    // 🌟 TUTUP STRUK KILAT O MILIDETIK TANPA REFRESH DATA SERVER
+    function closeStruk() { 
+      document.getElementById('m-struk').style.display = 'none'; 
     }
 
-    // TOP UP — DIUBAH: google.script.run → fetch
-    async function saveTopUp() {
-      const nom = getAngka(document.getElementById('u-nom').value);
+    function tampilkanFormCancel() {
+      var containerForm = document.getElementById('container-form-cancel');
+      if (!containerForm) return;
+      if (containerForm.style.display === 'none' || containerForm.style.display === '') {
+        containerForm.style.display = 'block';
+        containerForm.scrollIntoView({ behavior: 'smooth' });
+      } else { containerForm.style.display = 'none'; }
+    }
+
+    function kirimPengajuanCancel(idStruk) {
+      var alasanInput = document.getElementById('input-alasan-cancel').value.trim();
+      if (alasanInput.length < 10) { alert("❌ Alasan terlalu pendek! Minimal 10 karakter."); return; }
+      if (!confirm("Apakah Anda yakin ingin mengajukan pembatalan untuk Struk #" + idStruk + "?")) { return; }
+      showLoading(true);
+      google.script.run
+        .withSuccessHandler(function(res) {
+          showLoading(false);
+          if (res && res.status === "success") {
+            alert("✅ " + res.message);
+            document.getElementById('container-form-cancel').style.display = 'none';
+            var areaTombol = document.getElementById('area-tombol-cancel-kukami');
+            if (areaTombol) { areaTombol.innerHTML = '<div style="background:#FFA500; color:white; text-align:center; padding:12px; border-radius:12px; font-weight:bold; font-size:13px; margin-top:15px;">⏳ MENUNGGU PERSETUJUAN ADMIN</div>'; }
+            initDashboard(); 
+          } else { alert("❌ Gagal: " + (res.message || "Terjadi kesalahan.")); }
+        })
+        .withFailureHandler(function(err) { showLoading(false); alert("❌ Gagal terhubung ke server."); })
+        .ajukanPembatalanStrukRider(idStruk, curRider.id, alasanInput);
+    }
+
+    // LOGIKA DINAMIS TOP UP 
+    function cekMetodeTopUp() {
+      try {
+        var met = document.getElementById('u-met').value;
+        var boxLainnya = document.getElementById('container-ket-lainnya');
+        if (boxLainnya) {
+          if (met === "LAIN LAIN") { boxLainnya.style.display = 'block'; } 
+          else { boxLainnya.style.display = 'none'; document.getElementById('u-ket-lainnya').value = ""; }
+        }
+      } catch(e) {}
+    }
+
+    function saveTopUp() {
+      var nom = getAngka(document.getElementById('u-nom').value);
+      var met = document.getElementById('u-met').value;
+      var ketLainnya = document.getElementById('u-ket-lainnya') ? document.getElementById('u-ket-lainnya').value.trim() : "";
+
       if (nom <= 0) return toast("⚠️ Isi nominal!");
+      if (!met) return toast("⚠️ Pilih metode!");
+      if (met === "LAIN LAIN" && ketLainnya.length < 5) {
+        alert("❌ Mohon isi penjelasan TOP UP CASH / DEPO secara detail!");
+        return;
+      }
+
+      var metodeFinal = met;
+      if (met === "LAIN LAIN") { metodeFinal = "LAIN LAIN: " + ketLainnya.toUpperCase(); }
+
       document.getElementById('m-topup').style.display = 'none';
       showLoading(true);
-      try {
-        await gasCall({
-          action: "topup",
-          payload: JSON.stringify({
-            idRider: curRider.id,
-            nominal: nom,
-            metode: document.getElementById('u-met').value,
-            deviceId: getFingerprint()
-          })
-        });
-        initDashboard();
-        showLoading(false);
-        toast("🚀 Terkirim!");
-      } catch(err) {
-        showLoading(false);
-        toast("⚠️ Gagal mengirim request!");
-      }
+
+      google.script.run.withSuccessHandler(function() { 
+        initDashboard(); 
+        showLoading(false); 
+        toast("🚀 Terkirim!"); 
+        document.getElementById('u-nom').value = "";
+        document.getElementById('u-met').selectedIndex = 0;
+        if(document.getElementById('container-ket-lainnya')) document.getElementById('container-ket-lainnya').style.display = 'none';
+        if(document.getElementById('u-ket-lainnya')) document.getElementById('u-ket-lainnya').value = "";
+      }).requestTopUp({ idRider: curRider.id, nominal: nom, metode: metodeFinal });
     }
 
-    function logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
+    function logout() { if (confirm("Logout?")) { localStorage.clear(); location.reload(); } }
 
+    // WINDOW ONLOAD BAWAAN ASLI SINKRONISASI MEMORI HP RIDER
     window.onload = function() {
-      const s = localStorage.getItem('kukami_session');
-      if (s) { curRider = JSON.parse(s); initDashboard(); }
-      document.getElementById('u-nom').addEventListener('input', function(e) { this.value = formatRibuan(this.value); });
+      var debug = document.getElementById('debug-layar');
+      try {
+        localStorage.setItem('tes_koneksi', 'ok');
+        localStorage.removeItem('tes_koneksi');
+        
+        // Alur masuk otomatis (Auto-Login murni) asli KUKAMI milik Bos
+        var s = localStorage.getItem('kukami_session');
+        if (s) { try { curRider = JSON.parse(s); initDashboard(); } catch(e) {} }
+        
+        // Load sisa keranjang belanja dari memori internal HP
+        var savedCart = localStorage.getItem('kukami_cart');
+        if (savedCart) {
+          try {
+            var parsed = JSON.parse(savedCart);
+            if (Array.isArray(parsed) && parsed.length > 0) { cart = parsed; renderCart(); }
+          } catch(e) {}
+        }
+        var elNom = document.getElementById('u-nom');
+        if (elNom) elNom.addEventListener('input', function() { this.value = formatRibuan(this.value); });
+      } catch (error) { if (debug) debug.innerText = "⚠️ MEMORI LOKAL DIBLOKIR SISTEM HP"; }
     };
 
     function cekValidasiQty() {
-      let listOngkir = cart.filter(i => i.ket.toLowerCase().includes("ongkir"));
-      let totalQtyOngkir = listOngkir.reduce((a, b) => a + b.qty, 0);
-
-      let qtyViolators = cart.filter(i => {
-        let k = i.ket.toLowerCase();
-        return i.qty > 1 && !k.includes("parkir") && !k.includes("tambah tempat");
-      });
-
-      let doubleOngkir = totalQtyOngkir > 1;
-      let missingOngkir = totalQtyOngkir === 0;
-      let hasQtyViolation = qtyViolators.length > 0;
-
+      var listOngkir = cart.filter(function(i) { return i.ket.toLowerCase().indexOf("ongkir") !== -1; });
+      var totalQtyOngkir = 0;
+      for (var f = 0; f < listOngkir.length; f++) { totalQtyOngkir += listOngkir[f].qty; }
+      var qtyViolators = cart.filter(function(i) { var k = i.ket.toLowerCase(); return i.qty > 1 && k.indexOf("parkir") === -1 && k.indexOf("tambah tempat") === -1; });
+      var doubleOngkir = totalQtyOngkir > 1; var missingOngkir = totalQtyOngkir === 0; var hasQtyViolation = qtyViolators.length > 0;
       if (doubleOngkir || missingOngkir || hasQtyViolation) {
-        const alertModal = document.getElementById('m-alert');
-        const content = alertModal.querySelector('.m-content');
-
-        content.style.padding = "30px 20px";
-        content.style.borderRadius = "24px";
-        content.style.border = "none";
-
-        let htmlBody = "";
-        if (missingOngkir) htmlBody += `<b style="color:var(--navy);">❌ Layanan ONGKIR belum ada!</b><br>`;
-        if (doubleOngkir) htmlBody += `<b style="color:var(--maroon);">⚠️ ONGKIR lebih dari 1 detected!</b> (Total: ${totalQtyOngkir})<br>`;
-        if (hasQtyViolation) htmlBody += `<b style="color:var(--maroon);">⚠️ Qty Layanan > 1:</b> ${qtyViolators.map(v => v.ket).join(', ')}<br>`;
-
-        content.innerHTML = `
-          <div style="font-size: 50px; margin-bottom: 15px;">⚠️</div>
-          <h3 style="margin: 0 0 10px 0; color: #333; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px;">CEK KERANJANG!</h3>
-          <div style="color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
-            ${htmlBody}
-            <br>Mohon pastikan kembali pesanan Anda sebelum lanjut.
-          </div>
-          <button class="btn" onclick="tutupAlert()" style="background: var(--maroon); border-radius: 12px; font-size: 14px; letter-spacing: 1px;">SAYA MENGERTI</button>
-        `;
-
+        var alertModal = document.getElementById('m-alert'); if(!alertModal) return;
+        var content = alertModal.querySelector('.m-content');
+        content.style.padding = "30px 20px"; content.style.borderRadius = "24px"; content.style.border = "none";
+        var htmlBody = "";
+        if (missingOngkir) htmlBody += '<b style="color:var(--navy);">❌ Layanan ONGKIR belum ada!</b><br>';
+        if (doubleOngkir) htmlBody += '<b style="color:var(--maroon);">⚠️ ONGKIR lebih dari 1 detected!</b> (Total: ' + totalQtyOngkir + ')<br>';
+        if (hasQtyViolation) htmlBody += '<b style="color:var(--maroon);">⚠️ Qty Layanan > 1:</b> ' + qtyViolators.map(function(v) { return v.ket; }).join(', ') + '<br>';
+        content.innerHTML = '<div style="font-size: 50px; margin-bottom: 15px;">⚠️</div><h3 style="margin: 0 0 10px 0; color: #333; font-family: \'Montserrat\', sans-serif; font-weight: 900; font-size: 18px;">CEK KERANJANG!</h3><div style="color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">' + htmlBody + '<br>Mohon pastikan kembali pesanan Anda sebelum lanjut.</div><button class="btn" onclick="tutupAlert()" style="background: var(--maroon); border-radius: 12px; font-size: 14px; letter-spacing: 1px;">SAYA MENGERTI</button>';
         alertModal.style.display = 'block';
       }
     }
 
-    function tutupAlert() {
-      document.getElementById('m-alert').style.display = 'none';
-    }
-
-    function updateRank(id, val, tipe) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (!val || val == 0 || val == "") { el.innerHTML = ''; return; }
-      let warna = (val <= 10) ? (tipe === 'hari' ? 'bg-rank-hari-top' : 'bg-rank-bulan-top') : 'bg-rank-grey';
-      el.innerHTML = `<span class="rank-badge ${warna}">#${val}</span>`;
-    }
-
+    function tutupAlert() { document.getElementById('m-alert').style.display = 'none'; }
+    function updateRank(id, val, tipe) { var el = document.getElementById(id); if (!el) return; if (!val || val == 0 || val == "") { el.innerHTML = ''; return; } var warna = (val <= 10) ? (tipe === 'hari' ? 'bg-rank-hari-top' : 'bg-rank-bulan-top') : 'bg-rank-grey'; el.innerHTML = '<span class="rank-badge ' + warna + '">#' + val + '</span>'; }
   </script>
 </body>
 </html>
