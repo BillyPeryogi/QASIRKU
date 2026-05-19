@@ -1,0 +1,16 @@
+{
+  "name": "KUKAMI",
+  "short_name": "KUKAMI",
+  "start_url": "https://script.google.com/macros/s/AKfycbwfebQ8V1-2Iw9O4x_hLD4Wv_TqFhmz0zK_G2IhyjD9V6M9h_WM-r3caSQespQuncpa2g/exec",
+  "display": "standalone",
+  "background_color": "#E5E5E5",
+  "theme_color": "#800000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
